@@ -1,0 +1,227 @@
+openapi: 3.0.3
+info:
+  license: 
+    name: PradeepKumar
+    url: https://localhost:7248/swagger/index.html
+  title: User Appointments
+  description: ''
+  version: v1
+
+servers:
+  - url: https://localhost:7248/swagger/index.html
+  - url: https://localhost:7248/swagger/index.html
+security: 
+  - ApiKeyAuth: []
+  
+paths:
+ /v1/appointments:
+    get: 
+      summary: Fetch Appointments by date
+      operationId: getAppointmentsByDate
+      tags: 
+        -  Appointments
+      parameters: 
+        - name: offSet
+          in: query
+          schema: 
+            type: integer
+            format: int32
+        - name: Count
+          in: query
+          schema: 
+            type: integer
+            format: int32
+        - name: searchByDate
+          in: query
+          schema: 
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Listed an Array of Appointments By Date
+          content: 
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/TruncatedModel"
+        '404':
+          description: No Appointments found for a day
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/NotFoundError"
+
+    post:
+      summary: Add new Appointment
+      operationId: addNewAppointment
+      tags:
+        - Appointments
+      requestBody:
+        required: true
+        description: Schema of New Appointment
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Appointment"
+      responses:
+        '201':
+          description: New Appointment Created
+          content:
+            application/json:    
+              schema:
+                  $ref: "#/components/schemas/NewAppointmentId"
+          
+        '409':
+          description: Conflict Occured
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConflictError" 
+
+ /v1/appointments/{appointmentId}:
+    get:
+      summary: Fetch Appointments by ID
+      operationId: getAppointmentById
+      tags:
+        - Appointments
+      parameters:
+        - name: appointmentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Listed Appointment By Id
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/Appointment"
+        '404':
+          description: No Appointments Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+
+    put:
+      summary: Update an existing Appointment
+      operationId: updateAppointment
+      tags:
+      - Appointments
+      parameters:
+        - name: appointmentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: appointment to be updated
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Appointment"
+
+      responses:
+        '204':
+          description: No Content
+         
+        '409':
+          description: Conflict Occured
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConflictError"
+        
+    delete:
+      summary: Delete an existing Appointment
+      operationId: deleteAppointment
+      tags:
+      - Appointments
+      parameters:
+          - name: appointmentId
+            in: path
+            description: Appointment Id
+            required: true
+            schema:
+              type: string
+              format: uuid
+      responses:
+        '204':
+          description: No Content
+          
+        '404':
+          description: No Appointment found with Id specified
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+
+        
+    
+components:
+  schemas: 
+# List of Appointments
+    TruncatedModel:
+      properties: 
+        isTruncated:
+          type: boolean
+          format: boolean
+          example: true
+        appointments:
+            type: object
+            properties: 
+              appointmentId:
+                type: string
+                format: uuid
+              appointmentstartTimeDate:
+                type: string
+                format: date-time
+              appointmentEndTimeDate:
+                type: string
+                format: date-time
+              appointmentTitle:
+                type: string
+                format: string
+              appointmentDescription:
+                type: string
+                format: string
+# single appointment
+    Appointment:
+      type: object
+      properties: 
+        appointmentstartTimeDate:
+          type: string
+          format: date-time
+        appointmentEndTimeDate:
+          type: string
+          format: date-time
+        appointmentTitle:
+          type: string
+          format: string
+        appointmentDescription:
+          type: string
+          format: string
+    NewAppointmentId:
+      type: object
+      properties: 
+        appointmentId:
+          type: string
+          format: uuid
+    NotFoundError:
+      type: integer
+      format: int32
+      example: 404
+
+    ConflictError:
+      type: integer
+      format: int32
+      example: 409
+
+  securitySchemes:
+    ApiKeyAuth:       
+      type: apiKey
+      in: query      
+      name: Access-Token
+          
