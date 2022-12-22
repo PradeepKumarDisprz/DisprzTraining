@@ -1,0 +1,429 @@
+
+
+// [HttpGet, Route("v1/appointments")]
+// [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TruncatedModel))]
+// public async Task<ActionResult> GetAppointments(DateTime? appointmentDate = null,string? title=null,int offSet = 0, int fetchCount = 25)
+// {
+//     var appointments=await _appointmentBL.GetAppointments(appointmentDate,title,offSet,fetchCount);
+//     return Ok(appointments);
+
+// }
+
+
+
+//    //get appointment by date
+//     [HttpGet, Route("v1/appointments")]
+//     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TruncatedModel))]
+//     public async Task<ActionResult> GetAppointments(DateTime? appointmentDate = null, string? title = null, int offSet = 0, int fetchCount = 10)
+//     {
+//         if (appointmentDate != null && title == null)
+//         {
+//             var appointmentByDate = await _appointmentBL.GetAppointments(appointmentDate);
+//             return Ok(appointmentByDate);
+
+//         }
+//         else if (title != null)
+//         {
+//             var appointmentByTitle = await _appointmentBL.GetAppointments(title);
+//             return Ok(appointmentByTitle);
+//         }
+//         else if (appointmentDate != null && title != null)
+//         {
+//             var appointmentByTitle = await _appointmentBL.GetAppointments(appointmentDate, title);
+//             return Ok(appointmentByTitle);
+//         }
+//         else
+//         {
+//             var appointments = await _appointmentBL.GetAppointments(offSet, fetchCount);
+//             return Ok(appointments);
+
+//         }
+
+//     }
+
+
+// [HttpGet, Route("v1/appointments")]
+// [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TruncatedModel))]
+// public async Task<ActionResult> GetAppointments([Required]int offSet = 0, [Required]int fetchCount = 10,DateTime? searchDate = null, string? searchTitle = null)
+// {
+//     if (searchDate != null && searchTitle == null)
+//     {
+//         var appointmentByDate = await _appointmentBL.GetAppointments(searchDate, offSet, fetchCount);
+//         return Ok(appointmentByDate);
+//     }
+//     else if (searchDate == null && searchTitle != null)
+//     {
+//         var appointmentByDate = await _appointmentBL.GetAppointments(searchTitle, offSet, fetchCount);
+//         return Ok(appointmentByDate);
+//     }
+//     else if (searchDate != null && searchTitle != null)
+//     {
+//         var appointmentByDate = await _appointmentBL.GetAppointments(searchDate,searchTitle, offSet, fetchCount);
+//         return Ok(appointmentByDate);
+//     }
+//     else
+//     {
+//         var appointments = await _appointmentBL.GetAppointments(offSet, fetchCount);
+//         return Ok(appointments);
+//     }
+
+// }
+
+
+//get appointment by date
+// [HttpGet, Route("v1/appointments")]
+// [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TruncatedModel))]
+// public async Task<ActionResult> GetAppointments([Required]int offSet = 0, [Required]int fetchCount = 10,DateTime? searchDate = null, string? searchTitle = null)
+// {
+//     if (searchDate != null && searchTitle == null)
+//     {
+//         var appointmentByDate = await _appointmentBL.GetAppointments(searchDate, offSet, fetchCount);
+//         return Ok(appointmentByDate);
+//     }
+//     else if (searchDate == null && searchTitle != null)
+//     {
+//         var appointmentByDate = await _appointmentBL.GetAppointments(searchTitle, offSet, fetchCount);
+//         return Ok(appointmentByDate);
+//     }
+//     else if (searchDate != null && searchTitle != null)
+//     {
+//         var appointmentByDate = await _appointmentBL.GetAppointments(searchDate,searchTitle, offSet, fetchCount);
+//         return Ok(appointmentByDate);
+//     }
+//     else
+//     {
+//         var appointments = await _appointmentBL.GetAppointments(offSet, fetchCount);
+//         return Ok(appointments);
+//     }
+
+// }
+
+
+
+
+
+
+
+
+//bL
+
+
+
+
+
+
+
+
+
+
+
+
+// //get all appointments
+//         public async Task<List<AppointmentDetails>>? GetAppointments()
+//         {
+//             return await _appointmentDAL.GetAppointments();
+//         }
+
+
+// //offset fetchcount
+//         public Task<TruncatedModel>? GetAppointments(int offSet, int fetchCount)
+//         {
+//             var allAppointments = AppointmentList.userAppointments;
+//             bool truncated = true;
+//             TruncatedModel appointment = new TruncatedModel();
+
+//             if (offSet > allAppointments.Count())
+//             {
+//                 truncated = false;
+//                 appointment.isTruncated = truncated;
+//             }
+//             else if ((offSet < allAppointments.Count() && offSet != allAppointments.Count() && fetchCount <= allAppointments.Count()))
+//             {
+//                 //offset should be less than the count of meets 
+//                 //else all meets will be skipped and no content will be displayed
+//                 try
+//                 {
+//                     var truncatedAppointment = allAppointments.GetRange(offSet, fetchCount);
+//                     if (truncatedAppointment.Any())
+//                     {
+//                         appointment.isTruncated = truncated;
+//                         appointment.Appointments = truncatedAppointment;
+//                     }
+//                 }
+//                 catch (Exception)
+//                 {
+
+//                 }
+//             }
+//             return Task.FromResult(appointment);
+//         }
+
+
+// //appointmentDate offset fetchcount
+//         public Task<TruncatedModel>? GetAppointments(DateTime? appointmentDate, int offSet, int fetchCount)
+//         {
+//             var allAppointments = AppointmentList.userAppointments;
+//             var appointmentByDate = allAppointments.Where(meet => meet.appointmentStartTime.Date == appointmentDate).OrderBy(meet => meet.appointmentStartTime).ToList();
+//             bool truncated = true;
+//             TruncatedModel appointment = new TruncatedModel();
+
+//             if (offSet > appointmentByDate.Count())
+//             {
+//                 truncated = false;
+//                 appointment.isTruncated = truncated;
+//             }
+//             else if ((offSet < appointmentByDate.Count() && offSet != appointmentByDate.Count() && fetchCount <= appointmentByDate.Count()))
+//             {
+//                 //offset should be less than the count of meets 
+//                 //else all meets will be skipped and no content will be displayed
+//                 try
+//                 {
+//                     var truncatedAppointment = appointmentByDate.GetRange(offSet, fetchCount);
+//                     if (truncatedAppointment.Any())
+//                     {
+//                         appointment.isTruncated = truncated;
+//                         appointment.Appointments = truncatedAppointment;
+//                     }
+//                 }
+//                 catch (Exception)
+//                 {
+
+//                 }
+//             }
+//             return Task.FromResult(appointment);
+//         }
+
+// //title offset fetchcount
+//         public Task<TruncatedModel>? GetAppointments(string? title, int offSet, int fetchCount)
+//         {
+//             var allAppointments = AppointmentList.userAppointments;
+//             var appointmentByTitle = allAppointments.Where(meet => meet.appointmentTitle == title).ToList();
+//             bool truncated = true;
+//             TruncatedModel appointment = new TruncatedModel();
+
+//             if (offSet > appointmentByTitle.Count())
+//             {
+//                 truncated = false;
+//                 appointment.isTruncated = truncated;
+//             }
+//             else if ((offSet < appointmentByTitle.Count() && offSet != appointmentByTitle.Count() && fetchCount <= appointmentByTitle.Count()))
+//             {
+//                 //offset should be less than the count of meets 
+//                 //else all meets will be skipped and no content will be displayed
+//                 try
+//                 {
+//                     var truncatedAppointment = appointmentByTitle.GetRange(offSet, fetchCount);
+//                     if (truncatedAppointment.Any())
+//                     {
+//                         appointment.isTruncated = truncated;
+//                         appointment.Appointments = truncatedAppointment;
+//                     }
+//                 }
+//                 catch (Exception)
+//                 {
+
+//                 }
+//             }
+//             return Task.FromResult(appointment);
+//         }
+
+// //appointmentDate title offset fetchcount
+
+//         public Task<TruncatedModel>? GetAppointments(DateTime? appointmentDate,string? title, int offSet, int fetchCount)
+//         {
+//             var allAppointments = AppointmentList.userAppointments;
+//             var appointmentByDateAndTitle = allAppointments.Where(meet => (meet.appointmentStartTime.Date == appointmentDate) && (meet.appointmentTitle == title)).OrderBy(meet => meet.appointmentStartTime).ToList();
+//             bool truncated = true;
+//             TruncatedModel appointment = new TruncatedModel();
+
+//             if (offSet > appointmentByDateAndTitle.Count())
+//             {
+//                 truncated = false;
+//                 appointment.isTruncated = truncated;
+//             }
+//             else if ((offSet < appointmentByDateAndTitle.Count() && offSet != appointmentByDateAndTitle.Count() && fetchCount <= appointmentByDateAndTitle.Count()))
+//             {
+//                 //offset should be less than the count of meets 
+//                 //else all meets will be skipped and no content will be displayed
+//                 try
+//                 {
+//                     var truncatedAppointment = appointmentByDateAndTitle.GetRange(offSet, fetchCount);
+//                     if (truncatedAppointment.Any())
+//                     {
+//                         appointment.isTruncated = truncated;
+//                         appointment.Appointments = truncatedAppointment;
+//                     }
+//                 }
+//                 catch (Exception)
+//                 {
+
+//                 }
+//             }
+//             return Task.FromResult(appointment);
+//         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// //get appointment by date with counts and offset
+// public Task<TruncatedModel>? GetAppointments(DateTime? appointmentDate, int offSet, int fetchCount)
+// {
+//     var allAppointments = AppointmentList.userAppointments;
+
+//     if (allAppointments.Any())
+//     {
+//         var appointmentMatchedByDate = from meet in allAppointments
+//                                        where meet.appointmentStartTime.Date == appointmentDate//optional
+//                                        orderby meet.appointmentStartTime
+//                                        select meet;
+
+
+//         if (appointmentMatchedByDate.Any())
+//         {
+//             if ((offSet < appointmentMatchedByDate.Count()))
+//             {
+//                 //offset should be less than the count of meets 
+//                 //else all meets will be skipped and no content will be displayed
+//                 var truncatedAppointment = appointmentMatchedByDate.Skip(offSet).Take(fetchCount).ToList();
+//                 if (truncatedAppointment.Any())
+//                 {
+//                     TruncatedModel appointmentTruncatedByDate = new TruncatedModel()
+//                     {
+//                         isTruncated = true,
+//                         Appointments = truncatedAppointment
+//                     };
+//                     return Task.FromResult(appointmentTruncatedByDate);
+//                 }
+//             }
+//         }
+//     }
+
+
+//     return null;
+// }
+
+
+
+// if (((appointment.appointmentStartTime >= meet.appointmentStartTime) && (appointment.appointmentStartTime < meet.appointmentEndTime)) ||
+//     (appointment.appointmentEndTime > meet.appointmentStartTime) && (appointment.appointmentEndTime < meet.appointmentEndTime) ||
+//     (appointment.appointmentStartTime <= meet.appointmentStartTime) && (appointment.appointmentEndTime >= meet.appointmentEndTime))
+
+// if (((appointment.appointmentStartTime >= meet.appointmentStartTime) && (appointment.appointmentStartTime <= meet.appointmentEndTime)) ||
+//     (appointment.appointmentEndTime >= meet.appointmentStartTime) && (appointment.appointmentEndTime <= meet.appointmentEndTime) ||
+//     (appointment.appointmentStartTime <= meet.appointmentStartTime) && (appointment.appointmentEndTime >= meet.appointmentEndTime))
+
+
+
+
+
+
+
+
+// //get by date
+// public Task<List<AppointmentDetails>>? GetAppointments(DateTime? appointmentDate)
+// {
+//     var allAppointments = AppointmentList.userAppointments;
+//     var appointmentByDate = allAppointments.Where(meet => meet.appointmentStartTime.Date == appointmentDate).OrderBy(meet => meet.appointmentStartTime).ToList();
+//     return Task.FromResult(appointmentByDate);
+// // }
+
+
+
+// public Task<List<AppointmentDetails>>? GetAppointments(string? title)
+// {
+//     var allAppointments = AppointmentList.userAppointments;
+//     var appointmentByTitle = allAppointments.Where(meet => meet.appointmentTitle == title).ToList();
+//     return Task.FromResult(appointmentByTitle);
+// }
+
+// public Task<List<AppointmentDetails>>? GetAppointments(DateTime? appointmentDate, string? title)
+// {
+//     var allAppointments = AppointmentList.userAppointments;
+//     var appointmentByDatenTitle = allAppointments.Where(meet => (meet.appointmentStartTime.Date == appointmentDate) && (meet.appointmentTitle == title)).OrderBy(meet => meet.appointmentStartTime).ToList();
+//     return Task.FromResult(appointmentByDatenTitle);
+// }
+
+
+//DAL
+
+
+        // public Task<List<AppointmentDetails>> GetAppointmentById(Guid appointmentId)
+        // {
+        //     var appointmentById = _userAppointments.Where(meet => meet.appointmentId == appointmentId).ToList();
+        //     return Task.FromResult(appointmentById);
+        // }
+
+
+        // public Task<NewAppointmentId> AddNewAppointment(Appointment newAppointment)
+        // {
+        //     var appointmentToBeAdded = new AppointmentDetails
+        //     {
+        //         appointmentId = Guid.NewGuid(),
+        //         appointmentStartTime = newAppointment.appointmentStartTime,
+        //         appointmentEndTime = newAppointment.appointmentEndTime,
+        //         appointmentTitle = newAppointment.appointmentTitle,
+        //         appointmentDescription = newAppointment.appointmentDescription
+        //     };
+
+        //     _userAppointments.Add(appointmentToBeAdded);
+
+        //     var createdID = new NewAppointmentId()
+        //     {
+        //         appointmentId = appointmentToBeAdded.appointmentId
+        //     };
+        //     return Task.FromResult(createdID);
+        // }
+
+
+
+        // public Task<bool> UpdateExistingAppointment(Guid appointmentId, Appointment existingAppointment)
+        // {
+        //     var appointmentToBeUpdated = new AppointmentDetails
+        //     {
+        //         appointmentId = appointmentId,
+        //         appointmentStartTime = existingAppointment.appointmentStartTime,
+        //         appointmentEndTime = existingAppointment.appointmentEndTime,
+        //         appointmentTitle = existingAppointment.appointmentTitle,
+        //         appointmentDescription = existingAppointment.appointmentDescription
+        //     };
+        //     _userAppointments.Add(appointmentToBeUpdated);
+        //     return Task.FromResult(true);
+        // }
+
+
+        // public Task<bool> DeleteAppointment(Guid appointmentId)
+        // {
+        //     var allAppointments = _userAppointments;
+        //     var appointmentMatched = allAppointments.Where(meet => meet.appointmentId == appointmentId).FirstOrDefault();
+        //     if (appointmentMatched != null)
+        //     {
+        //         return Task.FromResult(allAppointments.Remove(appointmentMatched));
+        //     }
+        //     return Task.FromResult(false);
+        // }
+    

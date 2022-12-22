@@ -5,7 +5,7 @@ namespace DisprzTraining.DataAccess
     public interface IAppointmentDAL
     {
         Task<List<Appointment>> GetAppointments();
-        Task AddAppointments(List<Appointment> appointment);
+        void AddAppointments(List<Appointment> appointment);
 
     }
 }

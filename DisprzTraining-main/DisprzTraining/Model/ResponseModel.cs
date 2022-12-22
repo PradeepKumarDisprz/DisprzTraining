@@ -8,6 +8,7 @@ namespace DisprzTraining.Model
 
     public class ErrorDetails
     {
+        public string language { get; set; }="en";
         public string errorMessage { get; set; }=string.Empty;
         public int errorCode { get; set; }
     }

@@ -69,23 +69,25 @@ namespace DisprzTraining.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetails))]
         public async Task<ActionResult> AddNewAppointment([FromBody] AppointmentDetail newAppointment)
         {
-            try
-            {
+          if(await _appointmentBL.CheckDateAndTimeFormat(newAppointment))
+          {
                 var newAppointmentId = await _appointmentBL.AddNewAppointment(newAppointment);
                 if (newAppointmentId!=null)
                 {
                     var uri = $"v1/appointments/{newAppointmentId}";
                     return Created(uri, newAppointmentId);    
+                    // Created(nameof(GetappointmentById),newAppointmentId);
                 }
                 else
                 {
-                 return Conflict(conflict);   
+                 return Conflict(new ErrorDetails()
+                 {
+                    errorMessage="exception",
+                    errorCode=409
+                 });   
                 }
-            }
-            catch (Exception)
-            {
-                return BadRequest(badRequest);
-            }
+          }
+            return BadRequest();
         }
 
         //update existing appointment
@@ -96,8 +98,9 @@ namespace DisprzTraining.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetails))]
         public async Task<ActionResult> UpdateExistingAppointment([FromRoute] Guid appointmentId, [FromBody] AppointmentDetail updateAppointment)
         {
-            try
-            {
+            
+               if(await _appointmentBL.CheckDateAndTimeFormat(updateAppointment))
+               {
                 var isAnyAppointment = await _appointmentBL.GetAppointmentById(appointmentId);
                 if (isAnyAppointment.Any())
                 {
@@ -112,12 +115,12 @@ namespace DisprzTraining.Controllers
                     }
                 }
                 return NotFound(notFound);
-            }
-            catch (Exception)
-            {
+               }
                 return BadRequest(badRequest);
-            }
+           
         }
+
+        //change conflict function
 
         //delete appointment by Id
         [HttpDelete, Route("v1/appointments/{appointmentId}")]
@@ -136,109 +139,3 @@ namespace DisprzTraining.Controllers
     }
 }
 
-
-
-
-
-
-
-
-
-
-// [HttpGet, Route("v1/appointments")]
-// [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TruncatedModel))]
-// public async Task<ActionResult> GetAppointments(DateTime? appointmentDate = null,string? title=null,int offSet = 0, int fetchCount = 25)
-// {
-//     var appointments=await _appointmentBL.GetAppointments(appointmentDate,title,offSet,fetchCount);
-//     return Ok(appointments);
-
-// }
-
-
-
-//    //get appointment by date
-//     [HttpGet, Route("v1/appointments")]
-//     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TruncatedModel))]
-//     public async Task<ActionResult> GetAppointments(DateTime? appointmentDate = null, string? title = null, int offSet = 0, int fetchCount = 10)
-//     {
-//         if (appointmentDate != null && title == null)
-//         {
-//             var appointmentByDate = await _appointmentBL.GetAppointments(appointmentDate);
-//             return Ok(appointmentByDate);
-
-//         }
-//         else if (title != null)
-//         {
-//             var appointmentByTitle = await _appointmentBL.GetAppointments(title);
-//             return Ok(appointmentByTitle);
-//         }
-//         else if (appointmentDate != null && title != null)
-//         {
-//             var appointmentByTitle = await _appointmentBL.GetAppointments(appointmentDate, title);
-//             return Ok(appointmentByTitle);
-//         }
-//         else
-//         {
-//             var appointments = await _appointmentBL.GetAppointments(offSet, fetchCount);
-//             return Ok(appointments);
-
-//         }
-
-//     }
-
-
-// [HttpGet, Route("v1/appointments")]
-// [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TruncatedModel))]
-// public async Task<ActionResult> GetAppointments([Required]int offSet = 0, [Required]int fetchCount = 10,DateTime? searchDate = null, string? searchTitle = null)
-// {
-//     if (searchDate != null && searchTitle == null)
-//     {
-//         var appointmentByDate = await _appointmentBL.GetAppointments(searchDate, offSet, fetchCount);
-//         return Ok(appointmentByDate);
-//     }
-//     else if (searchDate == null && searchTitle != null)
-//     {
-//         var appointmentByDate = await _appointmentBL.GetAppointments(searchTitle, offSet, fetchCount);
-//         return Ok(appointmentByDate);
-//     }
-//     else if (searchDate != null && searchTitle != null)
-//     {
-//         var appointmentByDate = await _appointmentBL.GetAppointments(searchDate,searchTitle, offSet, fetchCount);
-//         return Ok(appointmentByDate);
-//     }
-//     else
-//     {
-//         var appointments = await _appointmentBL.GetAppointments(offSet, fetchCount);
-//         return Ok(appointments);
-//     }
-
-// }
-
-
-//get appointment by date
-// [HttpGet, Route("v1/appointments")]
-// [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TruncatedModel))]
-// public async Task<ActionResult> GetAppointments([Required]int offSet = 0, [Required]int fetchCount = 10,DateTime? searchDate = null, string? searchTitle = null)
-// {
-//     if (searchDate != null && searchTitle == null)
-//     {
-//         var appointmentByDate = await _appointmentBL.GetAppointments(searchDate, offSet, fetchCount);
-//         return Ok(appointmentByDate);
-//     }
-//     else if (searchDate == null && searchTitle != null)
-//     {
-//         var appointmentByDate = await _appointmentBL.GetAppointments(searchTitle, offSet, fetchCount);
-//         return Ok(appointmentByDate);
-//     }
-//     else if (searchDate != null && searchTitle != null)
-//     {
-//         var appointmentByDate = await _appointmentBL.GetAppointments(searchDate,searchTitle, offSet, fetchCount);
-//         return Ok(appointmentByDate);
-//     }
-//     else
-//     {
-//         var appointments = await _appointmentBL.GetAppointments(offSet, fetchCount);
-//         return Ok(appointments);
-//     }
-
-// }

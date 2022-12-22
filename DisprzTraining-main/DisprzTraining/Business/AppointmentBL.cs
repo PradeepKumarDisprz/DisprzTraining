@@ -13,6 +13,14 @@ namespace DisprzTraining.Business
         }
 
         List<Appointment>? _allAppointments;
+        public async Task<bool> CheckDateAndTimeFormat(AppointmentDetail updateAppointment)
+        {
+        if ((updateAppointment.appointmentEndTime <= updateAppointment.appointmentStartTime)||(updateAppointment.appointmentStartTime.Date<DateTime.Now.Date||updateAppointment.appointmentEndTime.Date<DateTime.Now.Date))
+            {
+                return await Task.FromResult(false);
+            }
+        return await Task.FromResult(true);
+        }
 
         public async Task<List<Appointment>> GetAppointments()
         {
@@ -32,12 +40,8 @@ namespace DisprzTraining.Business
             {
                 if (appointmentMatched.Any()&&fetchCount!=0)
                 {
-                    if (offSet > 0)
-                    {
-                        offSet -= 1;
-                    }
-
-                    var meetingSkipped = appointmentMatched.Skip(offSet).ToList();
+                   
+                    var meetingSkipped = appointmentMatched.Skip(offSet==0?offSet-1:offSet).ToList();
                     if (fetchCount >= meetingSkipped.Count())
                     {
                         truncatedAppointment = meetingSkipped;
@@ -77,8 +81,8 @@ namespace DisprzTraining.Business
             return appointmentById;
         }
 
-
-        public async Task<bool> CheckCreateAppointmentConflict(AppointmentDetail appointment)
+//list.where
+        public async Task<bool> CheckAppointmentConflict(AppointmentDetail appointment)
         {
                 _allAppointments = await _appointmentDAL.GetAppointments();
                 if (_allAppointments.Count() != 0)
@@ -99,11 +103,7 @@ namespace DisprzTraining.Business
         public async Task<NewAppointmentId?> AddNewAppointment(AppointmentDetail newAppointment)
         {
 
-             if ((newAppointment.appointmentEndTime <= newAppointment.appointmentStartTime)||(newAppointment.appointmentStartTime.Date<DateTime.Now.Date||newAppointment.appointmentEndTime.Date<DateTime.Now.Date))
-            {
-                throw new Exception();
-            }
-            var isNoConflict= await CheckCreateAppointmentConflict(newAppointment);
+            var isNoConflict= await CheckAppointmentConflict(newAppointment);
 
             if(isNoConflict==true)
             {
@@ -129,34 +129,11 @@ namespace DisprzTraining.Business
         }
 
 
-        public async Task<bool> CheckUpdateAppointmentConflict(Guid appointmentId, AppointmentDetail appointment)
-        {
-                _allAppointments = await _appointmentDAL.GetAppointments();
-                foreach (var meet in _allAppointments)
-                {
-                    if (meet.appointmentId == appointmentId)
-                    {
-                        continue;
-                    }
-                    else if ((meet.appointmentStartTime < appointment.appointmentEndTime) && (appointment.appointmentStartTime < meet.appointmentEndTime))
-                    {
-                        
-                        return false;
-                    }
-                }
-                return true;
-        }
-
-
         //update existing appointment
         public async Task<bool> UpdateExistingAppointment(Guid appointmentId, AppointmentDetail updateAppointment)
         {
-            if ((updateAppointment.appointmentEndTime <= updateAppointment.appointmentStartTime)||(updateAppointment.appointmentStartTime.Date<DateTime.Now.Date||updateAppointment.appointmentEndTime.Date<DateTime.Now.Date))
-            {
-                throw new Exception();
-            }
-
-            var isNoConflict = await CheckUpdateAppointmentConflict(appointmentId, updateAppointment);
+            
+            var isNoConflict = await CheckAppointmentConflict(updateAppointment);
             if (isNoConflict==true)
             {
                 _allAppointments = await _appointmentDAL.GetAppointments();
@@ -177,6 +154,7 @@ namespace DisprzTraining.Business
                 }
             }
             return isNoConflict;   
+            }
         }
 
 
@@ -216,261 +194,3 @@ namespace DisprzTraining.Business
 
 
 
-
-
-
-
-
-
-
-
-
-// //get all appointments
-//         public async Task<List<AppointmentDetails>>? GetAppointments()
-//         {
-//             return await _appointmentDAL.GetAppointments();
-//         }
-
-
-// //offset fetchcount
-//         public Task<TruncatedModel>? GetAppointments(int offSet, int fetchCount)
-//         {
-//             var allAppointments = AppointmentList.userAppointments;
-//             bool truncated = true;
-//             TruncatedModel appointment = new TruncatedModel();
-
-//             if (offSet > allAppointments.Count())
-//             {
-//                 truncated = false;
-//                 appointment.isTruncated = truncated;
-//             }
-//             else if ((offSet < allAppointments.Count() && offSet != allAppointments.Count() && fetchCount <= allAppointments.Count()))
-//             {
-//                 //offset should be less than the count of meets 
-//                 //else all meets will be skipped and no content will be displayed
-//                 try
-//                 {
-//                     var truncatedAppointment = allAppointments.GetRange(offSet, fetchCount);
-//                     if (truncatedAppointment.Any())
-//                     {
-//                         appointment.isTruncated = truncated;
-//                         appointment.Appointments = truncatedAppointment;
-//                     }
-//                 }
-//                 catch (Exception)
-//                 {
-
-//                 }
-//             }
-//             return Task.FromResult(appointment);
-//         }
-
-
-// //appointmentDate offset fetchcount
-//         public Task<TruncatedModel>? GetAppointments(DateTime? appointmentDate, int offSet, int fetchCount)
-//         {
-//             var allAppointments = AppointmentList.userAppointments;
-//             var appointmentByDate = allAppointments.Where(meet => meet.appointmentStartTime.Date == appointmentDate).OrderBy(meet => meet.appointmentStartTime).ToList();
-//             bool truncated = true;
-//             TruncatedModel appointment = new TruncatedModel();
-
-//             if (offSet > appointmentByDate.Count())
-//             {
-//                 truncated = false;
-//                 appointment.isTruncated = truncated;
-//             }
-//             else if ((offSet < appointmentByDate.Count() && offSet != appointmentByDate.Count() && fetchCount <= appointmentByDate.Count()))
-//             {
-//                 //offset should be less than the count of meets 
-//                 //else all meets will be skipped and no content will be displayed
-//                 try
-//                 {
-//                     var truncatedAppointment = appointmentByDate.GetRange(offSet, fetchCount);
-//                     if (truncatedAppointment.Any())
-//                     {
-//                         appointment.isTruncated = truncated;
-//                         appointment.Appointments = truncatedAppointment;
-//                     }
-//                 }
-//                 catch (Exception)
-//                 {
-
-//                 }
-//             }
-//             return Task.FromResult(appointment);
-//         }
-
-// //title offset fetchcount
-//         public Task<TruncatedModel>? GetAppointments(string? title, int offSet, int fetchCount)
-//         {
-//             var allAppointments = AppointmentList.userAppointments;
-//             var appointmentByTitle = allAppointments.Where(meet => meet.appointmentTitle == title).ToList();
-//             bool truncated = true;
-//             TruncatedModel appointment = new TruncatedModel();
-
-//             if (offSet > appointmentByTitle.Count())
-//             {
-//                 truncated = false;
-//                 appointment.isTruncated = truncated;
-//             }
-//             else if ((offSet < appointmentByTitle.Count() && offSet != appointmentByTitle.Count() && fetchCount <= appointmentByTitle.Count()))
-//             {
-//                 //offset should be less than the count of meets 
-//                 //else all meets will be skipped and no content will be displayed
-//                 try
-//                 {
-//                     var truncatedAppointment = appointmentByTitle.GetRange(offSet, fetchCount);
-//                     if (truncatedAppointment.Any())
-//                     {
-//                         appointment.isTruncated = truncated;
-//                         appointment.Appointments = truncatedAppointment;
-//                     }
-//                 }
-//                 catch (Exception)
-//                 {
-
-//                 }
-//             }
-//             return Task.FromResult(appointment);
-//         }
-
-// //appointmentDate title offset fetchcount
-
-//         public Task<TruncatedModel>? GetAppointments(DateTime? appointmentDate,string? title, int offSet, int fetchCount)
-//         {
-//             var allAppointments = AppointmentList.userAppointments;
-//             var appointmentByDateAndTitle = allAppointments.Where(meet => (meet.appointmentStartTime.Date == appointmentDate) && (meet.appointmentTitle == title)).OrderBy(meet => meet.appointmentStartTime).ToList();
-//             bool truncated = true;
-//             TruncatedModel appointment = new TruncatedModel();
-
-//             if (offSet > appointmentByDateAndTitle.Count())
-//             {
-//                 truncated = false;
-//                 appointment.isTruncated = truncated;
-//             }
-//             else if ((offSet < appointmentByDateAndTitle.Count() && offSet != appointmentByDateAndTitle.Count() && fetchCount <= appointmentByDateAndTitle.Count()))
-//             {
-//                 //offset should be less than the count of meets 
-//                 //else all meets will be skipped and no content will be displayed
-//                 try
-//                 {
-//                     var truncatedAppointment = appointmentByDateAndTitle.GetRange(offSet, fetchCount);
-//                     if (truncatedAppointment.Any())
-//                     {
-//                         appointment.isTruncated = truncated;
-//                         appointment.Appointments = truncatedAppointment;
-//                     }
-//                 }
-//                 catch (Exception)
-//                 {
-
-//                 }
-//             }
-//             return Task.FromResult(appointment);
-//         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// //get appointment by date with counts and offset
-// public Task<TruncatedModel>? GetAppointments(DateTime? appointmentDate, int offSet, int fetchCount)
-// {
-//     var allAppointments = AppointmentList.userAppointments;
-
-//     if (allAppointments.Any())
-//     {
-//         var appointmentMatchedByDate = from meet in allAppointments
-//                                        where meet.appointmentStartTime.Date == appointmentDate//optional
-//                                        orderby meet.appointmentStartTime
-//                                        select meet;
-
-
-//         if (appointmentMatchedByDate.Any())
-//         {
-//             if ((offSet < appointmentMatchedByDate.Count()))
-//             {
-//                 //offset should be less than the count of meets 
-//                 //else all meets will be skipped and no content will be displayed
-//                 var truncatedAppointment = appointmentMatchedByDate.Skip(offSet).Take(fetchCount).ToList();
-//                 if (truncatedAppointment.Any())
-//                 {
-//                     TruncatedModel appointmentTruncatedByDate = new TruncatedModel()
-//                     {
-//                         isTruncated = true,
-//                         Appointments = truncatedAppointment
-//                     };
-//                     return Task.FromResult(appointmentTruncatedByDate);
-//                 }
-//             }
-//         }
-//     }
-
-
-//     return null;
-// }
-
-
-
-// if (((appointment.appointmentStartTime >= meet.appointmentStartTime) && (appointment.appointmentStartTime < meet.appointmentEndTime)) ||
-//     (appointment.appointmentEndTime > meet.appointmentStartTime) && (appointment.appointmentEndTime < meet.appointmentEndTime) ||
-//     (appointment.appointmentStartTime <= meet.appointmentStartTime) && (appointment.appointmentEndTime >= meet.appointmentEndTime))
-
-// if (((appointment.appointmentStartTime >= meet.appointmentStartTime) && (appointment.appointmentStartTime <= meet.appointmentEndTime)) ||
-//     (appointment.appointmentEndTime >= meet.appointmentStartTime) && (appointment.appointmentEndTime <= meet.appointmentEndTime) ||
-//     (appointment.appointmentStartTime <= meet.appointmentStartTime) && (appointment.appointmentEndTime >= meet.appointmentEndTime))
-
-
-
-
-
-
-
-
-// //get by date
-// public Task<List<AppointmentDetails>>? GetAppointments(DateTime? appointmentDate)
-// {
-//     var allAppointments = AppointmentList.userAppointments;
-//     var appointmentByDate = allAppointments.Where(meet => meet.appointmentStartTime.Date == appointmentDate).OrderBy(meet => meet.appointmentStartTime).ToList();
-//     return Task.FromResult(appointmentByDate);
-// // }
-
-
-
-// public Task<List<AppointmentDetails>>? GetAppointments(string? title)
-// {
-//     var allAppointments = AppointmentList.userAppointments;
-//     var appointmentByTitle = allAppointments.Where(meet => meet.appointmentTitle == title).ToList();
-//     return Task.FromResult(appointmentByTitle);
-// }
-
-// public Task<List<AppointmentDetails>>? GetAppointments(DateTime? appointmentDate, string? title)
-// {
-//     var allAppointments = AppointmentList.userAppointments;
-//     var appointmentByDatenTitle = allAppointments.Where(meet => (meet.appointmentStartTime.Date == appointmentDate) && (meet.appointmentTitle == title)).OrderBy(meet => meet.appointmentStartTime).ToList();
-//     return Task.FromResult(appointmentByDatenTitle);
-// }
