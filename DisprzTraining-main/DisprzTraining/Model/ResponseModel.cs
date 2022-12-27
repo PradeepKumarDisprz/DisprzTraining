@@ -6,7 +6,7 @@ namespace DisprzTraining.Model
         public Guid appointmentId { get; set; }
     }
 
-    public class ErrorDetails
+    public class ErrorMessage
     {
         public string language { get; set; }="en";
         public string errorMessage { get; set; }=string.Empty;

@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "rvMpERjTUeSXLeXspsVEVK95mU2PkvvUEp0c5R4eYJJQ0YSVmwionocHUCfLWkRf4rbSIa4ioz3aNuIIstISEg==",
+  "dgSpecHash": "cyYTftYO10koBfuYDqRfMmi/2mLu/G6scCigO16JMO0NTcLUt5QFZ0sGvwFU7lYlbj1yBMJX6fQVyWo/NQBfRg==",
   "success": true,
   "projectFilePath": "c:\\Users\\pradeep.g_disprz\\Desktop\\Project\\DisprzTraining-main\\DisprzTraining.Tests\\DisprzTraining.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\pradeep.g_disprz\\.nuget\\packages\\castle.core\\5.1.0\\castle.core.5.1.0.nupkg.sha512",
     "C:\\Users\\pradeep.g_disprz\\.nuget\\packages\\coverlet.collector\\3.1.2\\coverlet.collector.3.1.2.nupkg.sha512",
+    "C:\\Users\\pradeep.g_disprz\\.nuget\\packages\\fluentassertions\\6.8.0\\fluentassertions.6.8.0.nupkg.sha512",
     "C:\\Users\\pradeep.g_disprz\\.nuget\\packages\\humanizer.core\\2.2.0\\humanizer.core.2.2.0.nupkg.sha512",
     "C:\\Users\\pradeep.g_disprz\\.nuget\\packages\\messagepack\\2.1.152\\messagepack.2.1.152.nupkg.sha512",
     "C:\\Users\\pradeep.g_disprz\\.nuget\\packages\\messagepack.annotations\\2.1.152\\messagepack.annotations.2.1.152.nupkg.sha512",

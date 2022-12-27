@@ -1,8 +1,12 @@
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace DisprzTraining.Model
 {
-    public class AppointmentDetail
+    public class AppointmentDTO
     {
         [Required]   
         public DateTime appointmentStartTime { get; set; }

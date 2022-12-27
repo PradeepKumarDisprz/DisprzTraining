@@ -13,60 +13,43 @@ namespace DisprzTraining.Business
         }
 
         List<Appointment>? _allAppointments;
-        public async Task<bool> CheckDateAndTimeFormat(AppointmentDetail updateAppointment)
-        {
-        if ((updateAppointment.appointmentEndTime <= updateAppointment.appointmentStartTime)||(updateAppointment.appointmentStartTime.Date<DateTime.Now.Date||updateAppointment.appointmentEndTime.Date<DateTime.Now.Date))
-            {
-                return await Task.FromResult(false);
-            }
-        return await Task.FromResult(true);
-        }
-
-        public async Task<List<Appointment>> GetAppointments()
-        {
-            return await _appointmentDAL.GetAppointments();
-        }
 
         public async Task<AllAppointments> GetAllAppointments(int offSet, int fetchCount, DateTime? searchDate, string? searchTitle)
         {
             _allAppointments = await _appointmentDAL.GetAppointments();
-            var appointmentMatched = _allAppointments.Where(meet => ((searchDate == null) || (meet.appointmentStartTime.Date == searchDate)) && ((searchTitle == null) || (meet.appointmentTitle.ToLower().Contains(searchTitle.ToLower())))).OrderBy(meet=>meet.appointmentStartTime).ToList();
-            List<Appointment> truncatedAppointment = new List<Appointment>();
+            var appointmentMatched = _allAppointments.Where(meet => ((searchDate == null) || (meet.appointmentStartTime.Date == searchDate)) && ((searchTitle == null) || (meet.appointmentTitle.ToLower().Contains(searchTitle.ToLower())))).OrderBy(meet => meet.appointmentStartTime).ToList();
+           
+            List<Appointment> AppointmentsTaken= new();
             bool isTruncated = false;
             int appointmentMatchedCount = appointmentMatched.Count();
+            
             //offset 5
             //fetchcount 10---fetches 10 data from 5
-            try
+            if (appointmentMatched.Any() && fetchCount != 0)
             {
-                if (appointmentMatched.Any()&&fetchCount!=0)
+
+                var meetingSkipped = appointmentMatched.Skip(offSet == 0 ? offSet - 1 : offSet).ToList();
+                if (fetchCount >= meetingSkipped.Count())
                 {
-                   
-                    var meetingSkipped = appointmentMatched.Skip(offSet==0?offSet-1:offSet).ToList();
-                    if (fetchCount >= meetingSkipped.Count())
-                    {
-                        truncatedAppointment = meetingSkipped;
-                        isTruncated = false;
-                    }
-                    else
-                    {
-                        truncatedAppointment = meetingSkipped.Take(fetchCount).ToList();
-                        isTruncated = true;
-                    }
+                    AppointmentsTaken = meetingSkipped;
+                    // isTruncated = false;
                 }
                 else
                 {
-                    truncatedAppointment=appointmentMatched;
+                    AppointmentsTaken = meetingSkipped.Take(fetchCount).ToList();
+                    isTruncated = true;
                 }
             }
-            catch (Exception)
+            else if(searchDate!=null&&searchTitle==null)
             {
-                isTruncated = false;
+                
+                AppointmentsTaken = appointmentMatched;
             }
             AllAppointments appointmentsFound = new AllAppointments()
             {
                 isTruncated = isTruncated,
                 count = appointmentMatchedCount,
-                appointments = truncatedAppointment
+                appointments = AppointmentsTaken
             };
             return appointmentsFound;
         }
@@ -74,105 +57,139 @@ namespace DisprzTraining.Business
 
 
         //get appointment by Id      
-        public async Task<List<Appointment>> GetAppointmentById(Guid appointmentId)
+        public async Task<Appointment?> GetAppointmentById(Guid appointmentId)
         {
             _allAppointments = await _appointmentDAL.GetAppointments();
-            var appointmentById = _allAppointments.Where(meet => meet.appointmentId == appointmentId).ToList();
-            return appointmentById;
-        }
-
-//list.where
-        public async Task<bool> CheckAppointmentConflict(AppointmentDetail appointment)
-        {
-                _allAppointments = await _appointmentDAL.GetAppointments();
-                if (_allAppointments.Count() != 0)
-                {
-                    foreach (var meet in _allAppointments)
-                    {
-                    
-                        if ((meet.appointmentStartTime < appointment.appointmentEndTime) && (appointment.appointmentStartTime < meet.appointmentEndTime))
-                        {
-                           return false;
-                        }
-                    }
-                }
-                return true;
-        }
-
-        // create new appointment
-        public async Task<NewAppointmentId?> AddNewAppointment(AppointmentDetail newAppointment)
-        {
-
-            var isNoConflict= await CheckAppointmentConflict(newAppointment);
-
-            if(isNoConflict==true)
+            var appointmentById = _allAppointments.Where(meet => meet.appointmentId == appointmentId);
+            
+            if (appointmentById.Any())
             {
-            _allAppointments = await _appointmentDAL.GetAppointments();
-            //generating Id for the newAppointment to be added
-            var appointmentToBeAdded = new Appointment()
-            {
-                appointmentId = Guid.NewGuid(),
-                appointmentStartTime = newAppointment.appointmentStartTime,
-                appointmentEndTime = newAppointment.appointmentEndTime,
-                appointmentTitle = newAppointment.appointmentTitle,
-                appointmentDescription = newAppointment.appointmentDescription
-            };
-            var newAppointmentId = new NewAppointmentId()
-            {
-                appointmentId = appointmentToBeAdded.appointmentId
-            };
-            _allAppointments.Add(appointmentToBeAdded);
-            _appointmentDAL.AddAppointments(_allAppointments);
-            return newAppointmentId;
+                return appointmentById.First();
             }
             return null;
         }
 
 
-        //update existing appointment
-        public async Task<bool> UpdateExistingAppointment(Guid appointmentId, AppointmentDetail updateAppointment)
+        public async Task<bool> CheckPastDateAndTime(AppointmentDTO appointment)
         {
-            
-            var isNoConflict = await CheckAppointmentConflict(updateAppointment);
-            if (isNoConflict==true)
+            if ((appointment.appointmentEndTime < appointment.appointmentStartTime) || (appointment.appointmentStartTime.Date < DateTime.Now.Date || appointment.appointmentEndTime.Date < DateTime.Now.Date))
             {
-                _allAppointments = await _appointmentDAL.GetAppointments();
-                var isExistingAppointmentDeleted = await DeleteAppointment(appointmentId);
-                if (isExistingAppointmentDeleted)
+                return await Task.FromResult(false);
+            }
+            return await Task.FromResult(true);
+        }
+
+
+        public async Task<bool> CheckAppointmentConflict(AppointmentDTO appointment)
+        {
+            if (appointment.appointmentEndTime == appointment.appointmentStartTime)
+            {
+                return false;
+            }
+            _allAppointments = await _appointmentDAL.GetAppointments();
+            if (_allAppointments.Count() != 0)
+            {
+                var CheckAppointmentPresent = _allAppointments.Where(meet => (meet.appointmentStartTime < appointment.appointmentEndTime) && (appointment.appointmentStartTime < meet.appointmentEndTime));//add = if conflict needed for 1:40:10 to 2:30:10 and 2:30:10 to 4:20:10
+                if (CheckAppointmentPresent.Any())
                 {
-                    //adding Id to the appointment Model
-                    var appointmentToBeUpdated = new Appointment()
-                    {
-                        appointmentId = appointmentId,
-                        appointmentStartTime = updateAppointment.appointmentStartTime,
-                        appointmentEndTime = updateAppointment.appointmentEndTime,
-                        appointmentTitle = updateAppointment.appointmentTitle,
-                        appointmentDescription = updateAppointment.appointmentDescription
-                    };
-                    _allAppointments.Add(appointmentToBeUpdated);
-                    _appointmentDAL.AddAppointments(_allAppointments);
+                    return false;
                 }
             }
-            return isNoConflict;   
+            return true;
+        }
+
+        // create new appointment
+        public async Task<NewAppointmentId?> AddNewAppointment(AppointmentDTO newAppointment)
+        {
+
+            var isNoConflict = await CheckAppointmentConflict(newAppointment);
+
+            if (isNoConflict == true)
+            {
+                _allAppointments = await _appointmentDAL.GetAppointments();
+                //generating Id for the newAppointment to be added
+                var appointmentToBeAdded = new Appointment()
+                {
+                    appointmentId = Guid.NewGuid(),
+                    appointmentStartTime = newAppointment.appointmentStartTime,
+                    appointmentEndTime = newAppointment.appointmentEndTime,
+                    appointmentTitle = newAppointment.appointmentTitle,
+                    appointmentDescription = newAppointment.appointmentDescription
+                };
+                var newAppointmentId = new NewAppointmentId()
+                {
+                    appointmentId = appointmentToBeAdded.appointmentId
+                };
+                _allAppointments.Add(appointmentToBeAdded);
+                _appointmentDAL.AddAppointments(_allAppointments);
+                return newAppointmentId;
             }
+            return null;
+        }
+
+        public async Task<bool> CheckAppointmentConflict(Guid appointmentId, AppointmentDTO appointment)
+        {
+            if (appointment.appointmentEndTime == appointment.appointmentStartTime)
+            {
+                return false;
+            }
+            _allAppointments = await _appointmentDAL.GetAppointments();
+
+            var CheckAppointmentPresent = _allAppointments.Where((meet => meet.appointmentId != appointmentId && (meet.appointmentStartTime < appointment.appointmentEndTime) && (appointment.appointmentStartTime < meet.appointmentEndTime)));//add = if conflict needed for 1:40:10 to 2:30:10 and 2:30:10 to 4:20:10
+            if (CheckAppointmentPresent.Any())
+            {
+                return false;
+            }
+
+            return true;
+        }
+        //gets deleted b4 conflict ==what if user dontupdates if conflict occurs(meet is deleted so it won't show)
+
+        //update existing appointment
+        public async Task<bool> UpdateExistingAppointment(Guid appointmentId, AppointmentDTO updateAppointment)
+        {
+            var isNoConflict = await CheckAppointmentConflict(appointmentId, updateAppointment);
+            if (isNoConflict)
+            {
+                var deleteAppointment = DeleteAppointment(appointmentId);
+                _allAppointments = await _appointmentDAL.GetAppointments();
+                //adding Id to the appointment Model
+                var appointmentToBeUpdated = new Appointment()
+                {
+                    appointmentId = appointmentId,
+                    appointmentStartTime = updateAppointment.appointmentStartTime,
+                    appointmentEndTime = updateAppointment.appointmentEndTime,
+                    appointmentTitle = updateAppointment.appointmentTitle,
+                    appointmentDescription = updateAppointment.appointmentDescription
+                };
+                _allAppointments.Add(appointmentToBeUpdated);
+                _appointmentDAL.AddAppointments(_allAppointments);
+            }
+            return isNoConflict;
         }
 
 
         //delete Appointment
         public async Task<bool> DeleteAppointment(Guid appointmentId)
         {
-            var _allAppointments = await _appointmentDAL.GetAppointments();
-            var isDeleted = _allAppointments.Remove(_allAppointments.Where(meet => meet.appointmentId == appointmentId).First());
-            if (isDeleted)
+            _allAppointments = await _appointmentDAL.GetAppointments();
+            var appointmentMatched = _allAppointments.Where(meet => meet.appointmentId == appointmentId);
+            var isDeleted = false;
+
+            if (appointmentMatched.Any())
             {
-                _appointmentDAL.AddAppointments(_allAppointments);
+                isDeleted = _allAppointments.Remove(appointmentMatched.First());
+                if (isDeleted)
+                {
+                   await _appointmentDAL.AddAppointments(_allAppointments);
+                }
             }
             return isDeleted;
         }
     }
+
+
 }
-
-
 
 
 
