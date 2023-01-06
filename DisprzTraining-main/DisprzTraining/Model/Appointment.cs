@@ -1,3 +1,4 @@
+
 namespace DisprzTraining.Model
 {
     public class Appointment:AppointmentDTO

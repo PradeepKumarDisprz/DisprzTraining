@@ -494,3 +494,5 @@ c:\Users\pradeep.g_disprz\Desktop\Project\DisprzTraining-main\DisprzTraining\obj
 c:\Users\pradeep.g_disprz\Desktop\Project\DisprzTraining-main\DisprzTraining\obj\Debug\net7.0\DisprzTraining.pdb
 c:\Users\pradeep.g_disprz\Desktop\Project\DisprzTraining-main\DisprzTraining\obj\Debug\net7.0\DisprzTraining.genruntimeconfig.cache
 c:\Users\pradeep.g_disprz\Desktop\Project\DisprzTraining-main\DisprzTraining\obj\Debug\net7.0\ref\DisprzTraining.dll
+C:\Users\pradeep.g_disprz\Desktop\Project\DisprzTraining-main\DisprzTraining\bin\Debug\net7.0\DisprzTraining.xml
+C:\Users\pradeep.g_disprz\Desktop\Project\DisprzTraining-main\DisprzTraining\obj\Debug\net7.0\DisprzTraining.xml

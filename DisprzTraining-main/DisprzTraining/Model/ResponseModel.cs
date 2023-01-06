@@ -6,19 +6,18 @@ namespace DisprzTraining.Model
         public Guid appointmentId { get; set; }
     }
 
-    public class ErrorMessage
+        public class ErrorResponse
     {
-        public string language { get; set; }="en";
+        public string language { get; set; }=string.Empty;
         public string errorMessage { get; set; }=string.Empty;
-        public int errorCode { get; set; }
+        public string errorCode { get; set; }=string.Empty;
     }
 
-    public class AllAppointments
+
+        public class PaginatedAppointments
     {
-        public int count { get; set; }
         public bool isTruncated { get; set; }
-        public List<Appointment>? appointments { get; set; }
-
-
+        public List<Appointment> appointments { get; set; }=new List<Appointment>();
     }
+    
 }  

@@ -1,8 +1,22 @@
 ﻿using DisprzTraining.Utils;
-using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:3000")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+        });
+});
+
 
 builder.Services.AddControllers()
 .AddJsonOptions(options =>
@@ -12,21 +26,19 @@ builder.Services.AddControllers()
     options.JsonSerializerOptions.UnknownTypeHandling = System.Text.Json.Serialization.JsonUnknownTypeHandling.JsonNode;
 });
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-HttpClient client = new HttpClient();
-client.BaseAddress = new Uri("http://example.com/");
-client.DefaultRequestHeaders
-      .Accept
-      .Add(new MediaTypeWithQualityHeaderValue("application/json"));//ACCEPT header
+builder.Services.AddSwaggerGen(c=>
+   {
+        var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+        c.IncludeXmlComments(xmlPath);
+    }
+);
 
 
 builder.Services.ConfigureDependencyInjections();
+
 
 var app = builder.Build();
 
@@ -37,10 +49,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
+app.UseCors();
 app.MapControllers();
 
 app.Run();

@@ -15,122 +15,100 @@ namespace DisprzTraining.Controllers
             _appointmentBL = appointmentBL;
         }
 
-        //get all appointments
-        [HttpGet, Route("v1/appointments")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AllAppointments))]
-        public async Task<ActionResult> GetAllAppointments([Required] int offSet = 0, [Required] int fetchCount = 10, DateTime? searchDate = null, string? searchTitle = null)
+        /// <summary>
+        /// Fetch Appointments By Date
+        /// </summary>
+        [HttpGet, Route("v1/api/appointments")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Appointment>))]
+        public ActionResult GetAppointmentByDate([FromQuery] DateTime date)
         {
-            var appointments = await _appointmentBL.GetAllAppointments(offSet, fetchCount, searchDate, searchTitle);
-            return Ok(appointments);
+            var appointmentFound = _appointmentBL.GetAppointmentByDate(date);
+            return Ok(appointmentFound);
         }
 
-        //get appointment by Id
-        [HttpGet, Route("v1/appointments/{appointmentId}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Appointment))]
-        public async Task<ActionResult> GetappointmentById([FromRoute] Guid appointmentId)
-        {
-            var existingAppointmentById = await _appointmentBL.GetAppointmentById(appointmentId);
-            if (existingAppointmentById != null)
-            {
-                return Ok(existingAppointmentById);
-            }
-            return NotFound(new ErrorMessage()
-            {
-                errorMessage = "No Appointment found with the given Id",
-                errorCode = 404
-            });
-        }
-
-        //add new appointment
-        [HttpPost, Route("v1/appointments")]
+        /// <summary>
+        /// Post a new Appointment
+        /// </summary>
+        [HttpPost, Route("v1/api/appointments")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(NewAppointmentId))]
-        [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ErrorMessage))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorMessage))]
-        public async Task<ActionResult> AddNewAppointment([FromBody] AppointmentDTO newAppointment)
+        [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
+        public ActionResult AddAppointment([FromBody] AppointmentDTO newAppointment)
         {
-            if (await _appointmentBL.CheckPastDateAndTime(newAppointment))
+            try
             {
-                var newAppointmentId = await _appointmentBL.AddNewAppointment(newAppointment);
-                if (newAppointmentId != null)
-                {
-                    var actionName = nameof(GetappointmentById);
-                    return Created(actionName, newAppointmentId);
-                }
-                else
-                {
-                    return Conflict(new ErrorMessage()
-                    {
-                        errorMessage = "Conflict occured between same meeting time or two different meetings",
-                        errorCode = 409
-                    });
-                }
+                var appointmentId = _appointmentBL.AddAppointment(newAppointment);
+                return (appointmentId != null) ? Created("", appointmentId) : Conflict(APIResponse.ConflictResponse);
             }
-            return BadRequest(new ErrorMessage()
+            catch (Exception)
             {
-                errorMessage = "Appointment for past time and days are not allowed ",
-                errorCode = 400
-            });
+                return BadRequest(APIResponse.BadRequestResponse);
+            }
         }
 
-        //update existing appointment
-        [HttpPut, Route("v1/appointments/{appointmentId}")]
+        /// <summary>
+        /// Delete an appointment
+        /// </summary>
+        [HttpDelete, Route("v1/api/appointments/{appointmentId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ErrorMessage))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorMessage))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorMessage))]
-        public async Task<ActionResult> UpdateExistingAppointment([FromRoute] Guid appointmentId, [FromBody] AppointmentDTO updateAppointment)
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+        public ActionResult DeleteAppointment([FromRoute] Guid appointmentId)
         {
-            var isDateTimeCorrect=await _appointmentBL.CheckPastDateAndTime(updateAppointment);
-            if (isDateTimeCorrect)
-            {
-                var appointmentPresent =await _appointmentBL.GetAppointmentById(appointmentId);
-                if (appointmentPresent!=null)
-                {
-                    bool isNoConflict = await _appointmentBL.UpdateExistingAppointment(appointmentId, updateAppointment);
-                    if (isNoConflict)
-                    {
-                        return NoContent();
-                    }
-                    else
-                    {
-                        return Conflict(new ErrorMessage()
-                        {
-                            errorMessage = "Conflict occured between same meeting time or two different meetings",
-                            errorCode = 409
-                        });
-                    }
-                }
-                return NotFound(new ErrorMessage()
-                {
-                    errorMessage = "No Appointment found with the given Id",
-                    errorCode = 404
-                });
-            }
-            return BadRequest(new ErrorMessage()
-            {
-                errorMessage = "Appointment for past time and days are not allowed ",
-                errorCode = 400
-            });
+            var isDeleted = _appointmentBL.DeleteAppointment(appointmentId);
+            return (isDeleted) ? NoContent() : NotFound(APIResponse.NotFoundResponse);
         }
+        
+        
+        
+        
 
 
-        //delete appointment by Id
-        [HttpDelete, Route("v1/appointments/{appointmentId}")]
+        ///for learning purpose///
+
+        /// <summary>
+        /// Update an Existing appointment
+        /// </summary>
+        [HttpPut, Route("v1/api/appointments/{appointmentId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorMessage))]
-        public async Task<ActionResult> DeleteAppointment([FromRoute] Guid appointmentId)
+        [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
+        public ActionResult UpdateAppointment([FromRoute] Guid appointmentId, [FromBody] AppointmentDTO updateAppointment)
         {
-            var isDeleted = await _appointmentBL.DeleteAppointment(appointmentId);
-            if (isDeleted)
+            try
             {
-                return NoContent();
+                bool noConflict = _appointmentBL.UpdateAppointment(appointmentId, updateAppointment);
+                return (noConflict) ? NoContent() : Conflict(APIResponse.ConflictResponse);
             }
-            return NotFound(new ErrorMessage()
+            catch (Exception)
             {
-                errorMessage = "No Appointment found with the given Id",
-                errorCode = 404
-            });
+                return BadRequest(APIResponse.BadRequestResponse);
+            }
         }
+
+        // /// <summary>
+        // /// Fetch All Appointments with Date/Title with offset and fetchCount
+        // /// </summary>
+        // [HttpGet, Route("v1/appointments")]
+        // [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaginatedAppointments))]
+        // public async Task<ActionResult> GetAllAppointments([Required] int offSet = 0, [Required] int fetchCount = 10, [DataType(DataType.Date)] DateTime? searchDate = null, string? searchTitle = null)
+        // {
+        //     var appointments = await _appointmentBL.GetAllAppointments(offSet, fetchCount, searchDate, searchTitle);
+        //     return Ok(appointments);
+        // }
+
+        // /// <summary>
+        // /// Fetch All Appointments with Date/Title with offset and fetchCount
+        // /// </summary>
+        // [HttpGet, Route("v1/appointments")]
+        // [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaginatedAppointments))]
+        // public async Task<ActionResult> GetAllAppointments([Required] int offSet = 0, [Required] int fetchCount = 10, [DataType(DataType.Date)] DateTime? searchDate = null, string? searchTitle = null)
+        // {
+        //     var appointments = await _appointmentBL.GetAllAppointments(offSet, fetchCount, searchDate, searchTitle);
+        //     return Ok(appointments);
+        // }
+
     }
 }
+
+
 

@@ -84,32 +84,6 @@ paths:
                 $ref: "#/components/schemas/ResponseError"
 
  /v1/appointments/{appointmentId}:
-    get:
-      summary: Fetch Appointments by ID
-      operationId: getAppointmentById
-      tags:
-        - Appointments
-      parameters:
-        - name: appointmentId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Listed Appointment By Id
-          content:
-            application/json:    
-              schema:
-                $ref: "#/components/schemas/AppointmentDTO"
-        '404':
-          description: No Appointments Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ResponseError"
-
     put:
       summary: Update an existing Appointment
       operationId: updateAppointment
@@ -139,12 +113,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ResponseError"
-        '404':
-          description: No Appointment Found with the given Id
-          content: 
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/ResponseError" 
         '400':
           description: Past Date and Time is not allowed
           content: 
@@ -243,8 +211,9 @@ components:
           type: string
           format: string
         errorCode:
-          type: integer
-          format: int32
+          type: string
+          format: string
+          example: "AC_001"
 
   securitySchemes:
     ApiKeyAuth:       

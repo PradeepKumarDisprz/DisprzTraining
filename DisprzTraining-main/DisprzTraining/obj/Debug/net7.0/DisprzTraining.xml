@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DisprzTraining</name>
+    </assembly>
+    <members>
+        <member name="M:DisprzTraining.Controllers.AppointmentsController.GetAppointmentByDate(System.DateTime)">
+            <summary>
+            Fetch Appointments By Date
+            </summary>
+        </member>
+        <member name="M:DisprzTraining.Controllers.AppointmentsController.AddAppointment(DisprzTraining.Model.AppointmentDTO)">
+            <summary>
+            Post a new Appointment
+            </summary>
+        </member>
+        <member name="M:DisprzTraining.Controllers.AppointmentsController.DeleteAppointment(System.Guid)">
+            <summary>
+            Delete an appointment
+            </summary>
+        </member>
+        <member name="M:DisprzTraining.Controllers.AppointmentsController.UpdateAppointment(System.Guid,DisprzTraining.Model.AppointmentDTO)">
+            for learning purpose///
+            <summary>
+            Update an Existing appointment
+            </summary>
+        </member>
+    </members>
+</doc>
