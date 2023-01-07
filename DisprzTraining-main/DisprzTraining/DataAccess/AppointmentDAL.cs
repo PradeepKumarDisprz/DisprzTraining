@@ -4,23 +4,24 @@ namespace DisprzTraining.DataAccess
 {
     public class AppointmentDAL : IAppointmentDAL
     {
-        private static List<Appointment> _userAppointments = new List<Appointment>()
-        {
-            new Appointment()
-            {
-                appointmentId=Guid.NewGuid(),
-                appointmentStartTime=DateTime.Now,
-                appointmentEndTime=DateTime.Now.AddHours(1),
-                appointmentTitle="standup",
-                appointmentDescription="meet is going to commence"
-            }
-        };
+        private static List<Appointment> _userAppointments = new List<Appointment>();
+        // {
+        //     new Appointment()
+        //     {
+        //         appointmentId=Guid.NewGuid(),
+        //         appointmentStartTime=DateTime.Now,
+        //         appointmentEndTime=DateTime.Now.AddHours(1),
+        //         appointmentTitle="standup",
+        //         appointmentDescription="meet is going to commence"
+        //     }
+        // };
         PaginatedAppointments appointmentsFound = new PaginatedAppointments();
 
         public List<Appointment> GetAppointmentByDate(DateTime date)
         {
             var appointmentMatched = (from appointment in _userAppointments
                                       where (appointment.appointmentStartTime.Date == date)
+                                      orderby appointment.appointmentStartTime
                                       select appointment).ToList();
             return appointmentMatched;
         }
@@ -30,26 +31,18 @@ namespace DisprzTraining.DataAccess
             var appointmentMatched = (from appointment in _userAppointments
                                       where appointment.appointmentId == appointmentId
                                       select appointment).FirstOrDefault();
-            if (appointmentMatched != null)
-            {
-                return _userAppointments.Remove(appointmentMatched);
-            }
-            return false;
+            return (appointmentMatched != null ? _userAppointments.Remove(appointmentMatched) : false);
         }
 
         public bool CheckAppointmentConflict(DateTime startTime, DateTime endTime, List<Appointment> appointments)
         {
-            if (endTime == startTime)
-            {
-                return false;
-            }
             var CheckAppointmentPresent = (from appointment in appointments
                                            where (appointment.appointmentStartTime < endTime) && (startTime < appointment.appointmentEndTime)
                                            select appointment).ToList();
             return (CheckAppointmentPresent.Any() ? false : true);
         }
 
-        public NewAppointmentId? AddAppointment(AppointmentDTO newAppointment)
+        public bool AddAppointment(Appointment newAppointment)
         {
             //gives appointments matching the date of the new appointment
             var appointmentsFound = (from appointment in _userAppointments
@@ -61,70 +54,51 @@ namespace DisprzTraining.DataAccess
                              : true;
             if (noConflict)
             {
-                //generating Id for the newAppointment to be added
-                var appointmentToBeAdded = new Appointment()
-                {
-                    appointmentId = Guid.NewGuid(),
-                    appointmentStartTime = newAppointment.appointmentStartTime,
-                    appointmentEndTime = newAppointment.appointmentEndTime,
-                    appointmentTitle = newAppointment.appointmentTitle,
-                    appointmentDescription = newAppointment.appointmentDescription
-                };
-                _userAppointments.Add(appointmentToBeAdded);
-                return new() { appointmentId = appointmentToBeAdded.appointmentId };
+                _userAppointments.Add(newAppointment);
+                return true;
             }
-            return null;
+            return false;
         }
 
-        public bool UpdateAppointment(Guid appointmentId, AppointmentDTO updateAppointment)
+        public bool UpdateAppointment(Appointment updateAppointment)
         {
             var appointmentsFound = (from appointment in _userAppointments
-                                     where (appointment.appointmentId != appointmentId) &&
+                                     where (appointment.appointmentId != updateAppointment.appointmentId) &&
                                      (appointment.appointmentStartTime.Date == updateAppointment.appointmentStartTime.Date)
                                      select appointment).ToList();
-            var noConflict = CheckAppointmentConflict(updateAppointment.appointmentStartTime, updateAppointment.appointmentEndTime, appointmentsFound);
+
+            var noConflict = appointmentsFound.Count() > 1 ?
+                             CheckAppointmentConflict(updateAppointment.appointmentStartTime, updateAppointment.appointmentEndTime, appointmentsFound)
+                             : true;
+
             if (noConflict)
             {
-                var deleteAppointment = DeleteAppointment(appointmentId);
-                //adding Id to the appointment Model
-                var appointmentToBeUpdated = new Appointment()
-                {
-                    appointmentId = appointmentId,
-                    appointmentStartTime = updateAppointment.appointmentStartTime,
-                    appointmentEndTime = updateAppointment.appointmentEndTime,
-                    appointmentTitle = updateAppointment.appointmentTitle,
-                    appointmentDescription = updateAppointment.appointmentDescription
-                };
-                _userAppointments.Add(appointmentToBeUpdated);
+                var deleteAppointment = DeleteAppointment(updateAppointment.appointmentId);
+                _userAppointments.Add(updateAppointment);
+                return true;
             }
-            return noConflict;
+            return false;
         }
 
-        // public async Task<PaginatedAppointments> GetAllAppointments(int offSet, int fetchCount, DateTime? searchDate, string? searchTitle)
-        // {
 
-        //     List<Appointment> AppointmentsTaken = new();
-        //     bool isTruncated = false;
-        //     var appointmentMatched = _userAppointments.Where(meet => ((searchDate == null) || (meet.appointmentStartTime.Date == searchDate)) && ((searchTitle == null) || (meet.appointmentTitle.ToLower().Contains(searchTitle.ToLower())))).OrderBy(meet => meet.appointmentStartTime).ToList();
-        //     if (appointmentMatched.Any() && fetchCount > 0)
-        //     {
-        //         var meetingSkipped = appointmentMatched.Skip(offSet).ToList();
-        //         if (fetchCount >= meetingSkipped.Count())
-        //         {
-        //             AppointmentsTaken = meetingSkipped;
-        //         }
-        //         else
-        //         {
-        //             AppointmentsTaken = meetingSkipped.Take(fetchCount).ToList();
-        //             isTruncated = true;
-        //         }
-        //     }
-        //     appointmentsFound.appointments = AppointmentsTaken;
-        //     appointmentsFound.isTruncated = isTruncated;
-        //     return await Task.FromResult(appointmentsFound);
-        // }
+        //for learning purpose
+        public PaginatedAppointments GetAllAppointments(int offSet, int fetchCount, DateTime? searchDate, string? searchTitle)
+        {
 
+            var appointmentMatched = _userAppointments.Where(meet => ((searchDate == null) || (meet.appointmentStartTime.Date == searchDate)) && ((searchTitle == null) || (meet.appointmentTitle.ToLower().Contains(searchTitle.ToLower())))).OrderBy(meet => meet.appointmentStartTime).ToList();
+            if (appointmentMatched.Any() && fetchCount > 0)
+            {
+                appointmentsFound.appointments = appointmentMatched.Skip(offSet).Take(fetchCount).ToList();
+                appointmentsFound.isTruncated = fetchCount >= appointmentMatched.Skip(offSet).Count() ? false : true;
+            }
+            else
+            {
+                appointmentsFound.appointments = appointmentMatched;
+                appointmentsFound.isTruncated = false;
+            }
 
+            return appointmentsFound;
+        }
     }
 }
 

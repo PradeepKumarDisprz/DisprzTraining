@@ -3,7 +3,7 @@ namespace DisprzTraining.Model
     //response for creation
     public class NewAppointmentId
     {
-        public Guid appointmentId { get; set; }
+        public Guid Id { get; set; }
     }
 
         public class ErrorResponse

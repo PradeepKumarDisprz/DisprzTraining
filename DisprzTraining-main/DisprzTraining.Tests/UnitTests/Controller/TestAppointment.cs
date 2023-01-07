@@ -15,10 +15,10 @@ namespace DisprzTraining.Tests.UnitTests.Controller
         private readonly Guid MockGuid = Guid.NewGuid();
 
         [Fact]
-        public async Task GetAllAppointment_Returns_200_Success_And_AllAppointmentsOfDateandTitle()
+        public async Task GetAllAppointment_Returns_200_Success_And_PaginatedAppointmentsOfDateandTitle()
         {
             //Arrange
-            var mockTruncated = new AllAppointments() { count = 2, isTruncated = true, appointments = MockData.MockAppointmentList };
+            var mockTruncated = new PaginatedAppointments() { isTruncated = true, appointments = MockData.MockAppointmentList };
             MockServiceBL.Setup(service => service.GetAllAppointments(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<string>())).ReturnsAsync(mockTruncated);
             var systemUnderTest = new AppointmentsController(MockServiceBL.Object);
 
@@ -27,7 +27,7 @@ namespace DisprzTraining.Tests.UnitTests.Controller
             var ObjectResult = (OkObjectResult)result;
 
             //Assert
-            Assert.IsType<AllAppointments>(ObjectResult.Value);
+            Assert.IsType<PaginatedAppointments>(ObjectResult.Value);
             Assert.True(ObjectResult.StatusCode.Equals(200));
             Assert.True(ObjectResult.Value.Equals(mockTruncated));
         }
@@ -36,7 +36,7 @@ namespace DisprzTraining.Tests.UnitTests.Controller
         public async Task GetAllAppointment_Returns_200_Success_And_EmptyList()
         {
             //Arrange
-            var mockTruncated = new AllAppointments() { count = 0, isTruncated = false, appointments = new List<Appointment>() };
+            var mockTruncated = new PaginatedAppointments() { isTruncated = false, appointments = new List<Appointment>() };
             MockServiceBL.Setup(service => service.GetAllAppointments(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<string>())).ReturnsAsync(mockTruncated);
             var systemUnderTest = new AppointmentsController(MockServiceBL.Object);
 
@@ -45,43 +45,17 @@ namespace DisprzTraining.Tests.UnitTests.Controller
             var ObjectResult = (OkObjectResult)result;
 
             //Assert
-            Assert.IsType<AllAppointments>(ObjectResult.Value);
+            Assert.IsType<PaginatedAppointments>(ObjectResult.Value);
             Assert.True(ObjectResult.StatusCode.Equals(200));
             Assert.True(ObjectResult.Value.Equals(mockTruncated));
+            // Assert.True(result..(mockTruncated));
         }
 
 
 
 
-        [Fact]
-        public async Task GetAppointmentById_Returns_200_Success_And_AppointmentById()
-        {
-            //Arrange
-            MockServiceBL.Setup(service => service.GetAppointmentById(It.IsAny<Guid>())).ReturnsAsync(MockData.MockAppointmentByID);
-            var systemUnderTest = new AppointmentsController(MockServiceBL.Object);
 
-            //Act
-            var result = await systemUnderTest.GetappointmentById(MockGuid);
-            var ObjectResult = (OkObjectResult)result;
 
-            //Assert
-            Assert.True(ObjectResult.StatusCode.Equals(200));
-            Assert.True(ObjectResult?.Value?.Equals(MockData.MockAppointmentByID));
-        }
-
-        [Fact]
-        public async Task GetAppointmentById_Returns_404_NotFound()
-        {
-            //Arrange
-            MockServiceBL.Setup(service => service.GetAppointmentById(It.IsAny<Guid>())).ReturnsAsync(() => null);
-            var systemUnderTest = new AppointmentsController(MockServiceBL.Object);
-
-            //Act
-            var result = await systemUnderTest.GetappointmentById(MockGuid) as NotFoundObjectResult;
-
-            //Assert
-            Assert.True(result?.StatusCode.Equals(404));
-        }
 
         // //Create new appointment
         [Fact]
@@ -92,12 +66,11 @@ namespace DisprzTraining.Tests.UnitTests.Controller
             {
                 appointmentId = Guid.NewGuid()
             };
-            MockServiceBL.Setup(service => service.CheckPastDateAndTime(It.IsAny<AppointmentDTO>())).ReturnsAsync(true);
-            MockServiceBL.Setup(service => service.AddNewAppointment(It.IsAny<AppointmentDTO>())).ReturnsAsync(expectedResult);
+            MockServiceBL.Setup(service => service.AddAppointment(It.IsAny<AppointmentDTO>())).ReturnsAsync(expectedResult);
             var systemUnderTest = new AppointmentsController(MockServiceBL.Object);
 
             //Act
-            var result = await systemUnderTest.AddNewAppointment(MockData.MockAppointment);
+            var result = await systemUnderTest.AddAppointment(MockData.MockAppointment);
             var ObjectResult = (CreatedResult)result;
 
             //Assert
@@ -109,12 +82,11 @@ namespace DisprzTraining.Tests.UnitTests.Controller
         public async Task AddNewAppointment_Returns_409_Conflict()
         {
             //Arrange
-            MockServiceBL.Setup(service => service.CheckPastDateAndTime(It.IsAny<AppointmentDTO>())).ReturnsAsync(true);
-            MockServiceBL.Setup(service => service.AddNewAppointment(It.IsAny<AppointmentDTO>())).ReturnsAsync(() => null);
+            MockServiceBL.Setup(service => service.AddAppointment(It.IsAny<AppointmentDTO>())).ReturnsAsync(() => null);
             var systemUnderTest = new AppointmentsController(MockServiceBL.Object);
 
             //Act
-            var result = await systemUnderTest.AddNewAppointment(MockData.MockAppointment);
+            var result = await systemUnderTest.AddAppointment(MockData.MockAppointment);
             var ObjectResult = (ConflictObjectResult)result;
 
             //Assert
@@ -125,12 +97,11 @@ namespace DisprzTraining.Tests.UnitTests.Controller
         public async Task AddNewAppointment_Returns_400_BadRequest_On_PastDateTime()
         {
             //Arrange            
-            MockServiceBL.Setup(service => service.CheckPastDateAndTime(It.IsAny<AppointmentDTO>())).ReturnsAsync(false);
             // MockServiceBL.Setup(service => service.GetAppointmentById(It.IsAny<Guid>())).ReturnsAsync(MockData.MockAppointmentByID);
             var systemUnderTest = new AppointmentsController(MockServiceBL.Object);
 
             //Act
-            var result = await systemUnderTest.AddNewAppointment(MockData.MockAppointment) as BadRequestObjectResult;
+            var result = await systemUnderTest.AddAppointment(MockData.MockAppointment) as BadRequestObjectResult;
 
             //Assert
             Assert.True(result?.StatusCode.Equals(400));
@@ -142,7 +113,6 @@ namespace DisprzTraining.Tests.UnitTests.Controller
         public async Task UpdateExistingAppointment_Returns_204_NoContent_On_Updation()
         {
             //Arrange
-            MockServiceBL.Setup(service => service.CheckPastDateAndTime(It.IsAny<AppointmentDTO>())).ReturnsAsync(true);
             MockServiceBL.Setup(service => service.GetAppointmentById(It.IsAny<Guid>())).ReturnsAsync(MockData.MockAppointmentByID);
             MockServiceBL.Setup(service => service.UpdateExistingAppointment(It.IsAny<Guid>(),It.IsAny<AppointmentDTO>())).ReturnsAsync(true);
             var controllerUnderTest = new AppointmentsController(MockServiceBL.Object);
@@ -159,7 +129,6 @@ namespace DisprzTraining.Tests.UnitTests.Controller
         public async Task UpdateExistingAppointment_Returns_409_Conflict()
         {
             //Arrange
-            MockServiceBL.Setup(service => service.CheckPastDateAndTime(It.IsAny<AppointmentDTO>())).ReturnsAsync(true);
             MockServiceBL.Setup(service => service.GetAppointmentById(It.IsAny<Guid>())).ReturnsAsync(MockData.MockAppointmentByID);
             MockServiceBL.Setup(service => service.UpdateExistingAppointment(It.IsAny<Guid>(),It.IsAny<AppointmentDTO>())).ReturnsAsync(false);
             var systemUnderTest = new AppointmentsController(MockServiceBL.Object);
@@ -176,7 +145,6 @@ namespace DisprzTraining.Tests.UnitTests.Controller
         public async Task UpdateExistingAppointment_Returns_404_NotFound_On_No_AppointmentExists()
         {
             //Arrange
-            MockServiceBL.Setup(service => service.CheckPastDateAndTime(It.IsAny<AppointmentDTO>())).ReturnsAsync(true);
             MockServiceBL.Setup(service => service.GetAppointmentById(It.IsAny<Guid>())).ReturnsAsync(() => null);
             var systemUnderTest = new AppointmentsController(MockServiceBL.Object);
 
@@ -192,7 +160,6 @@ namespace DisprzTraining.Tests.UnitTests.Controller
         public async Task UpdateExistingAppointment_Returns_400_BadRequest_On_PastDateTime()
         {
             //Arrange            
-            MockServiceBL.Setup(service => service.CheckPastDateAndTime(It.IsAny<AppointmentDTO>())).ReturnsAsync(false);
             // MockServiceBL.Setup(service => service.GetAppointmentById(It.IsAny<Guid>())).ReturnsAsync(MockData.MockAppointmentByID);
             var systemUnderTest = new AppointmentsController(MockServiceBL.Object);
 

@@ -2,21 +2,42 @@ openapi: 3.0.3
 info:
   license: 
     name: PradeepKumar
-    url: https://localhost:7248/swagger/index.html
-  title: User Appointments
+    url: https://localhost:5169/swagger/index.html
+  title: DisprzCalendarAPI_PK
   description: ''
   version: v1
 
 servers:
-  - url: https://localhost:7248/swagger/index.html
-  - url: https://localhost:7248/swagger/index.html
+  - url: https://localhost:5169/swagger/index.html
+  - url: https://localhost:5169/swagger/index.html
 security: 
   - ApiKeyAuth: []
   
 paths:
- /v1/appointments:
+ /v1/api/appointments/date:
     get: 
-      summary: Fetch Appointments
+      summary: Fetch Appointments By Date
+      operationId: getAppointmentByDate
+      tags: 
+      -  Appointments
+      parameters: 
+      - name: date
+        in: query
+        required: true
+        schema: 
+          type: string
+          format: date-time
+      responses:
+       '200':
+          description: Listed an Array of Appointments By Date
+          content: 
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Appointment"
+    
+ /v1/api/appointments:
+    get: 
+      summary: Fetch All Appointments with Date/Title with offset and fetchCount
       operationId: getAllAppointments
       tags: 
         -  Appointments
@@ -27,7 +48,7 @@ paths:
           schema: 
             type: integer
             format: int32
-        - name: Count
+        - name: fetchCount
           in: query
           required: true
           schema: 
@@ -45,12 +66,11 @@ paths:
             format: string
       responses:
         '200':
-          description: Listed an Array of Appointments By Date
+          description: Listed an Array of All Appointments
           content: 
             application/json:
               schema: 
-                $ref: "#/components/schemas/AllAppointments"
-
+                $ref: "#/components/schemas/PaginatedAppointments"
     post:
       summary: Add new Appointment
       operationId: addNewAppointment
@@ -75,15 +95,15 @@ paths:
           content: 
             application/json:
               schema: 
-                $ref: "#/components/schemas/ResponseError" 
+                $ref: "#/components/schemas/ErrorResponse" 
         '409':
           description: Conflict Occured
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ResponseError"
+                $ref: "#/components/schemas/ErrorResponse"
 
- /v1/appointments/{appointmentId}:
+ /v1/api/appointments/{appointmentId}:
     put:
       summary: Update an existing Appointment
       operationId: updateAppointment
@@ -96,6 +116,7 @@ paths:
           schema:
             type: string
             format: uuid
+            example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
       requestBody:
         description: appointment to be updated
         content:
@@ -112,16 +133,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ResponseError"
+                $ref: "#/components/schemas/ErrorResponse"
         '400':
-          description: Past Date and Time is not allowed
+          description: Appointment for past time and days are not allowed or input starttime and endtime may be same
           content: 
             application/json:
               schema: 
-                $ref: "#/components/schemas/ResponseError"
+                $ref: "#/components/schemas/ErrorResponse"
         
     delete:
-      summary: Delete an existing Appointment
+      summary: Delete an Appointment
       operationId: deleteAppointment
       tags:
       - Appointments
@@ -133,31 +154,53 @@ paths:
             schema:
               type: string
               format: uuid
+              example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
       responses:
         '204':
           description: No Content
           
         '404':
-          description: No Appointment found with Id specified
+          description: No Appointment found with the given Id
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ResponseError"
+                $ref: "#/components/schemas/ErrorResponse"
 
-        
+     
+
+              
     
 components:
   schemas: 
+# Appointments
+    Appointment:
+      type: array
+      items: 
+        type: object
+        properties: 
+          appointmentId:
+            type: string
+            format: uuid
+            example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+          appointmentStartTime:
+            type: string
+            format: date-time
+          appointmentEndTime:
+            type: string
+            format: date-time
+          appointmentTitle:
+            type: string
+            format: string
+          appointmentDescription:
+            type: string
+            format: string
+
 # List of Appointments
-    AllAppointments:
+    PaginatedAppointments:
       properties:
-        count:
-          type: integer
-          format:  int32 
         isTruncated:
           type: boolean
           format: boolean
-          example: true
         appointments:
           type: array
           items: 
@@ -166,10 +209,11 @@ components:
               appointmentId:
                 type: string
                 format: uuid
-              appointmentstartTimeDate:
+                example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+              appointmentStartTime:
                 type: string
                 format: date-time
-              appointmentEndTimeDate:
+              appointmentEndTime:
                 type: string
                 format: date-time
               appointmentTitle:
@@ -182,10 +226,10 @@ components:
     AppointmentDTO:
       type: object
       properties: 
-        appointmentstartTimeDate:
+        appointmentStartTime:
           type: string
           format: date-time
-        appointmentEndTimeDate:
+        appointmentEndTime:
           type: string
           format: date-time
         appointmentTitle:
@@ -194,14 +238,17 @@ components:
         appointmentDescription:
           type: string
           format: string
+
+#new appointmentId
     NewAppointmentId:
       type: object
       properties: 
-        appointmentId:
+        id:
           type: string
           format: uuid
-    
-    ResponseError:
+
+#response for different errors
+    ErrorResponse:
       type: object
       properties: 
         language: 
@@ -213,7 +260,6 @@ components:
         errorCode:
           type: string
           format: string
-          example: "AC_001"
 
   securitySchemes:
     ApiKeyAuth:       

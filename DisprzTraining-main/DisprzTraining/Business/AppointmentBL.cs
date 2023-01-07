@@ -1,4 +1,3 @@
-using System.Net.Http;
 using DisprzTraining.DataAccess;
 using DisprzTraining.Model;
 
@@ -13,6 +12,7 @@ namespace DisprzTraining.Business
             _appointmentDAL = appointmentDAL;
         }
 
+        // get appointment by date
         public List<Appointment> GetAppointmentByDate(DateTime date)
         {
             return _appointmentDAL.GetAppointmentByDate(date);
@@ -21,12 +21,17 @@ namespace DisprzTraining.Business
         // create new appointment
         public NewAppointmentId? AddAppointment(AppointmentDTO newAppointment)
         {
-            if ((newAppointment.appointmentEndTime < newAppointment.appointmentStartTime)
-                || (newAppointment.appointmentStartTime < DateTime.Now))
+            //generating Id for the newAppointment to be added
+            Appointment appointmentToBeAdded = new()
             {
-                throw new Exception();
-            }
-            return _appointmentDAL.AddAppointment(newAppointment);
+                appointmentId = Guid.NewGuid(),
+                appointmentStartTime = newAppointment.appointmentStartTime,
+                appointmentEndTime = newAppointment.appointmentEndTime,
+                appointmentTitle = newAppointment.appointmentTitle,
+                appointmentDescription = newAppointment.appointmentDescription
+            };
+            var isCreated = _appointmentDAL.AddAppointment(appointmentToBeAdded);
+            return isCreated ? new() { Id = appointmentToBeAdded.appointmentId } : null;
         }
 
         //delete Appointment
@@ -35,25 +40,30 @@ namespace DisprzTraining.Business
             return _appointmentDAL.DeleteAppointment(appointmentId);
         }
 
-
-        //for learning purpose
         public bool UpdateAppointment(Guid appointmentId, AppointmentDTO updateAppointment)
         {
-            if ((updateAppointment.appointmentEndTime < updateAppointment.appointmentStartTime) 
-               || (updateAppointment.appointmentStartTime.Date < DateTime.Now.Date))
+            Appointment appointmentToBeUpdated = new()
             {
-                throw new Exception();
-            }
-            return  _appointmentDAL.UpdateAppointment(appointmentId, updateAppointment);
+                appointmentId = appointmentId,
+                appointmentStartTime = updateAppointment.appointmentStartTime,
+                appointmentEndTime = updateAppointment.appointmentEndTime,
+                appointmentTitle = updateAppointment.appointmentTitle,
+                appointmentDescription = updateAppointment.appointmentDescription
+            };
+            var isUpdated = _appointmentDAL.UpdateAppointment(appointmentToBeUpdated);
+            return isUpdated ? true : false;
+        }
+
+
+        public PaginatedAppointments GetAllAppointments(int offSet, int fetchCount, DateTime? searchDate, string? searchTitle)
+        {
+            return  _appointmentDAL.GetAllAppointments(offSet, fetchCount, searchDate, searchTitle);
         }
     }
 }
 
 
 
-
-
-// throw(); 406 Not accepted
 //for learning purpose
 
 // public async Task<bool> UpdateAppointment(Guid appointmentId, AppointmentDTO updateAppointment)
