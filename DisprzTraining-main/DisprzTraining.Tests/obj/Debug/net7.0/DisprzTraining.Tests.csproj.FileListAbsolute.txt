@@ -653,3 +653,4 @@ c:\Users\pradeep.g_disprz\Desktop\Project\DisprzTraining-main\DisprzTraining.Tes
 c:\Users\pradeep.g_disprz\Desktop\Project\DisprzTraining-main\DisprzTraining.Tests\obj\Debug\net7.0\DisprzTraining.Tests.genruntimeconfig.cache
 c:\Users\pradeep.g_disprz\Desktop\Project\DisprzTraining-main\DisprzTraining.Tests\obj\Debug\net7.0\ref\DisprzTraining.Tests.dll
 c:\Users\pradeep.g_disprz\Desktop\Project\DisprzTraining-main\DisprzTraining.Tests\bin\Debug\net7.0\FluentAssertions.dll
+c:\Users\pradeep.g_disprz\Desktop\Project\DisprzTraining-main\DisprzTraining.Tests\bin\Debug\net7.0\DisprzTraining.xml

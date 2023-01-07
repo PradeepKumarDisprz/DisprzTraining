@@ -131,25 +131,25 @@ namespace DisprzTraining.Controllers
             bool noConflict = _appointmentBL.UpdateAppointment(Id, updateAppointment);
             return (noConflict) ? NoContent() : Conflict(APIResponse.ConflictResponse);
         }
- 
 
 
 
 
-// ///for learning purpose/// //
 
-/// <summary>
-/// Fetch All Appointments with Date/Title with offset and fetchCount
-/// </summary>
-[HttpGet, Route("v1/api/appointments")]
-[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaginatedAppointments))]
-public ActionResult GetAllAppointments([Required] int offSet = 0, [Required] int fetchCount = 10, [DataType(DataType.Date)] DateTime? searchDate = null, string? searchTitle = null)
-{
-    var appointments =  _appointmentBL.GetAllAppointments(offSet, fetchCount, searchDate, searchTitle);
-    return Ok(appointments);
-}
+        // ///for learning purpose/// //
+
+        /// <summary>
+        /// Fetch All Appointments with Date/Title with offset and fetchCount
+        /// </summary>
+        [HttpGet, Route("v1/api/appointments")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaginatedAppointments))]
+        public ActionResult GetAllAppointments([Required] int offSet = 0, [Required] int fetchCount = 10, [DataType(DataType.Date)] DateTime? searchDate = null, string? searchTitle = null)
+        {
+            var appointments = _appointmentBL.GetAllAppointments(offSet, fetchCount, searchDate, searchTitle);
+            return Ok(appointments);
+        }
 
 
 
-   }
+    }
 }

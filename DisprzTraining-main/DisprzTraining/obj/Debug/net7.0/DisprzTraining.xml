@@ -18,7 +18,7 @@
         </member>
         <member name="M:DisprzTraining.Controllers.AppointmentsController.AddAppointment(DisprzTraining.Model.AppointmentDTO)">
              <summary>
-             Post a new Appointment
+             Add new Appointment
              </summary>
              <param name="newAppointment"></param>
              <remarks>
