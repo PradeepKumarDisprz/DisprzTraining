@@ -1,76 +1,39 @@
 openapi: 3.0.3
 info:
-  license: 
+  license:
     name: PradeepKumar
     url: https://localhost:5169/swagger/index.html
   title: DisprzCalendarAPI_PK
-  description: ''
+  description: ""
   version: v1
 
 servers:
   - url: https://localhost:5169/swagger/index.html
   - url: https://localhost:5169/swagger/index.html
-security: 
+security:
   - ApiKeyAuth: []
-  
+
 paths:
- /v1/api/appointments/date:
-    get: 
+  /v1/api/appointments:
+    get:
       summary: Fetch Appointments By Date
       operationId: getAppointmentByDate
-      tags: 
-      -  Appointments
-      parameters: 
-      - name: date
-        in: query
-        required: true
-        schema: 
-          type: string
-          format: date-time
-      responses:
-       '200':
-          description: Listed an Array of Appointments By Date
-          content: 
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/Appointment"
-    
- /v1/api/appointments:
-    get: 
-      summary: Fetch All Appointments with Date/Title with offset and fetchCount
-      operationId: getAllAppointments
-      tags: 
-        -  Appointments
-      parameters: 
-        - name: offSet
+      tags:
+        - Appointments
+      parameters:
+        - name: date
           in: query
           required: true
-          schema: 
-            type: integer
-            format: int32
-        - name: fetchCount
-          in: query
-          required: true
-          schema: 
-            type: integer
-            format: int32
-        - name: searchDate
-          in: query
-          schema: 
+          schema:
             type: string
             format: date-time
-        - name: searchTitle
-          in: query
-          schema: 
-            type: string
-            format: string
       responses:
-        '200':
-          description: Listed an Array of All Appointments
-          content: 
+        "200":
+          description: Listed an Array of Appointments By Date
+          content:
             application/json:
-              schema: 
-                $ref: "#/components/schemas/PaginatedAppointments"
+              schema:
+                $ref: "#/components/schemas/Appointment"
     post:
       summary: Add new Appointment
       operationId: addNewAppointment
@@ -84,31 +47,31 @@ paths:
             schema:
               $ref: "#/components/schemas/AppointmentDTO"
       responses:
-        '201':
+        "201":
           description: New Appointment Created
           content:
-            application/json:    
-              schema:
-                  $ref: "#/components/schemas/NewAppointmentId"
-        '400':
-          description: Past Date and Time is not allowed
-          content: 
             application/json:
-              schema: 
-                $ref: "#/components/schemas/ErrorResponse" 
-        '409':
+              schema:
+                $ref: "#/components/schemas/NewAppointmentId"
+        "400":
+          description: Past Date and Time is not allowed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
           description: Conflict Occured
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
- /v1/api/appointments/{appointmentId}:
+  /v1/api/appointments/{appointmentId}:
     put:
       summary: Update an existing Appointment
       operationId: updateAppointment
       tags:
-      - Appointments
+        - Appointments
       parameters:
         - name: appointmentId
           in: path
@@ -125,59 +88,92 @@ paths:
               $ref: "#/components/schemas/AppointmentDTO"
 
       responses:
-        '204':
+        "204":
           description: No Content
-         
-        '409':
+
+        "409":
           description: Conflict Occured
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        '400':
+        "400":
           description: Appointment for past time and days are not allowed or input starttime and endtime may be same
-          content: 
+          content:
             application/json:
-              schema: 
+              schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        
+
     delete:
       summary: Delete an Appointment
       operationId: deleteAppointment
       tags:
-      - Appointments
+        - Appointments
       parameters:
-          - name: appointmentId
-            in: path
-            description: Appointment Id
-            required: true
-            schema:
-              type: string
-              format: uuid
-              example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+        - name: appointmentId
+          in: path
+          description: Appointment Id
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
       responses:
-        '204':
+        "204":
           description: No Content
-          
-        '404':
+
+        "404":
           description: No Appointment found with the given Id
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-     
+  /v1/api/allappointments:
+    get:
+      summary: Fetch All Appointments with Date/Title with offset and fetchCount
+      operationId: getAllAppointments
+      tags:
+        - Appointments
+      parameters:
+        - name: offSet
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: fetchCount
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: searchDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: searchTitle
+          in: query
+          schema:
+            type: string
+            format: string
+      responses:
+        "200":
+          description: Listed an Array of All Appointments
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedAppointments"
 
-              
-    
 components:
-  schemas: 
-# Appointments
+  schemas:
+    # Appointments
     Appointment:
       type: array
-      items: 
+      items:
         type: object
-        properties: 
+        properties:
           appointmentId:
             type: string
             format: uuid
@@ -195,7 +191,7 @@ components:
             type: string
             format: string
 
-# List of Appointments
+    # List of Appointments
     PaginatedAppointments:
       properties:
         isTruncated:
@@ -203,9 +199,9 @@ components:
           format: boolean
         appointments:
           type: array
-          items: 
+          items:
             type: object
-            properties: 
+            properties:
               appointmentId:
                 type: string
                 format: uuid
@@ -222,10 +218,10 @@ components:
               appointmentDescription:
                 type: string
                 format: string
-# single appointment
+    # single appointment
     AppointmentDTO:
       type: object
-      properties: 
+      properties:
         appointmentStartTime:
           type: string
           format: date-time
@@ -239,19 +235,19 @@ components:
           type: string
           format: string
 
-#new appointmentId
+    #new appointmentId
     NewAppointmentId:
       type: object
-      properties: 
+      properties:
         id:
           type: string
           format: uuid
 
-#response for different errors
+    #response for different errors
     ErrorResponse:
       type: object
-      properties: 
-        language: 
+      properties:
+        language:
           type: string
           format: string
         errorMessage:
@@ -262,8 +258,7 @@ components:
           format: string
 
   securitySchemes:
-    ApiKeyAuth:       
+    ApiKeyAuth:
       type: apiKey
-      in: query      
+      in: query
       name: Access-Token
-          

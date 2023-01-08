@@ -26,9 +26,9 @@ namespace DisprzTraining.Controllers
         /// </remarks>
         /// <response code="200">Returns list of appointment or empty list if no appointments found</response>
         //- GET /api/appointments/day
-        [HttpGet, Route("v1/api/appointments/date")]
+        [HttpGet, Route("v1/api/appointments")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Appointment>))]
-        public ActionResult GetAppointmentByDate([FromQuery] DateTime date)
+        public ActionResult GetAppointmentByDate([FromQuery][Required] DateTime date)
         {
             var appointmentFound = _appointmentBL.GetAppointmentByDate(date);
             return Ok(appointmentFound);
@@ -141,7 +141,7 @@ namespace DisprzTraining.Controllers
         /// <summary>
         /// Fetch All Appointments with Date/Title with offset and fetchCount
         /// </summary>
-        [HttpGet, Route("v1/api/appointments")]
+        [HttpGet, Route("v1/api/allappointments")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaginatedAppointments))]
         public ActionResult GetAllAppointments([Required] int offSet = 0, [Required] int fetchCount = 10, [DataType(DataType.Date)] DateTime? searchDate = null, string? searchTitle = null)
         {

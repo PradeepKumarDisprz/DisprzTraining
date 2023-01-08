@@ -4,8 +4,7 @@ namespace DisprzTraining.Tests.MockDatas
 {
     public static class MockData
     {
-
-        public static AppointmentDTO MockAppointment = new AppointmentDTO()
+        public static AppointmentDTO MockAppointmentDTO = new AppointmentDTO()
         {
             appointmentStartTime = DateTime.Now.AddHours(1),
             appointmentEndTime = DateTime.Now.AddHours(2),
@@ -103,64 +102,64 @@ namespace DisprzTraining.Tests.MockDatas
         },
          new Appointment{
             appointmentId=Guid.Parse("27921518-40f1-4580-946b-d47eb379453e"),
-            appointmentStartTime = new DateTime(2023, 01, 06, 13, 30, 00),
-            appointmentEndTime = new DateTime(2023, 01, 06, 14, 30, 00),
+            appointmentStartTime = new DateTime(2023, 01, 06, 14, 30, 00),
+            appointmentEndTime = new DateTime(2023, 01, 06, 15, 30, 00),
             appointmentTitle = "worldCup Discussion",
             appointmentDescription = "will messi win the WC"
         },
-                 new Appointment{
+        new Appointment{
             appointmentId=Guid.Parse("17981518-40f1-4580-946b-d47eb379453e"),
-            appointmentStartTime = DateTime.Now,
-            appointmentEndTime = DateTime.Now.AddHours(1),
+            appointmentStartTime = new DateTime(2023, 01, 06, 14, 30, 00),
+            appointmentEndTime = new DateTime(2023, 01, 06, 15, 30, 00),
             appointmentTitle = "worldCup Discussion",
             appointmentDescription = "will messi win the WC"
         },
          new Appointment{
             appointmentId=Guid.Parse("47981518-40f1-4580-946b-d47eb379453e"),
-            appointmentStartTime = DateTime.Now,
-            appointmentEndTime = DateTime.Now.AddHours(1),
+            appointmentStartTime = new DateTime(2023, 01, 06, 15, 30, 00),
+            appointmentEndTime = new DateTime(2023, 01, 06, 16, 30, 00),
             appointmentTitle = "worldCup Discussion",
             appointmentDescription = "will messi win the WC"
         },
-                 new Appointment{
+        new Appointment{
             appointmentId=Guid.Parse("57981518-40f1-4580-946b-d47eb379453e"),
-            appointmentStartTime = DateTime.Now,
-            appointmentEndTime = DateTime.Now.AddHours(1),
+            appointmentStartTime = new DateTime(2023, 01, 06, 16, 30, 00),
+            appointmentEndTime = new DateTime(2023, 01, 06, 17, 30, 00),
             appointmentTitle = "worldCup Discussion",
             appointmentDescription = "will messi win the WC"
         },
          new Appointment{
             appointmentId=Guid.Parse("67981518-40f1-4580-946b-d47eb379453e"),
-            appointmentStartTime = DateTime.Now,
-            appointmentEndTime = DateTime.Now.AddHours(1),
+            appointmentStartTime = new DateTime(2023, 01, 06, 17, 30, 00),
+            appointmentEndTime = new DateTime(2023, 01, 06, 18, 30, 00),
             appointmentTitle = "worldCup Discussion",
             appointmentDescription = "will messi win the WC"
         },
-                 new Appointment{
+        new Appointment{
             appointmentId=Guid.Parse("77981518-40f1-4580-946b-d47eb379453e"),
-            appointmentStartTime = new DateTime(2023, 01, 06, 13, 30, 00),
-            appointmentEndTime = new DateTime(2023, 01, 06, 14, 30, 00),
+            appointmentStartTime = new DateTime(2023, 01, 06, 18, 30, 00),
+            appointmentEndTime = new DateTime(2023, 01, 06, 19, 30, 00),
             appointmentTitle = "worldCup Discussion",
             appointmentDescription = "will messi win the WC"
         },
          new Appointment{
             appointmentId=Guid.Parse("87981518-40f1-4580-946b-d47eb379453e"),
-            appointmentStartTime = new DateTime(2023, 01, 06, 13, 30, 00),
-            appointmentEndTime = new DateTime(2023, 01, 06, 14, 30, 00),
+            appointmentStartTime = new DateTime(2023, 01, 06, 19, 30, 00),
+            appointmentEndTime = new DateTime(2023, 01, 06, 20, 30, 00),
             appointmentTitle = "worldCup Discussion",
             appointmentDescription = "will messi win the WC"
         },
-                 new Appointment{
+        new Appointment{
             appointmentId=Guid.Parse("97981518-40f1-4580-946b-d47eb379453e"),
-            appointmentStartTime = DateTime.Now,
-            appointmentEndTime = DateTime.Now.AddHours(1),
+            appointmentStartTime = new DateTime(2023, 01, 06, 21, 30, 00),
+            appointmentEndTime = new DateTime(2023, 01, 06, 22, 30, 00),
             appointmentTitle = "worldCup Discussion",
             appointmentDescription = "will messi win the WC"
         },
          new Appointment{
             appointmentId=Guid.Parse("10981518-40f1-4580-946b-d47eb379453e"),
-            appointmentStartTime = DateTime.Now,
-            appointmentEndTime = DateTime.Now.AddHours(1),
+            appointmentStartTime = new DateTime(2023, 01, 06, 22, 30, 00),
+            appointmentEndTime = new DateTime(2023, 01, 06, 23, 30, 00),
             appointmentTitle = "worldCup Discussion",
             appointmentDescription = "will messi win the WC"
         }

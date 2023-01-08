@@ -19,7 +19,8 @@ namespace DisprzTraining.Tests.UnitTests.Controller
         public void GetAppointmentByDate_Returns_200_Success_And_List_Of_Appointments()
         {
             //Arrange
-            MockServiceBL.Setup(service => service.GetAppointmentByDate(It.IsAny<DateTime>())).Returns(MockData.MockAppointmentList);
+            var expectedResult =MockData.MockAppointmentList;
+            MockServiceBL.Setup(service => service.GetAppointmentByDate(It.IsAny<DateTime>())).Returns(expectedResult);
             var systemUnderTest = new AppointmentsController(MockServiceBL.Object);
 
             //Act
@@ -29,7 +30,7 @@ namespace DisprzTraining.Tests.UnitTests.Controller
             //Assert
             Assert.IsType<List<Appointment>>(ObjectResult.Value);
             Assert.True(ObjectResult.StatusCode.Equals(200));
-            Assert.True(ObjectResult.Value.Equals(MockData.MockAppointmentList));
+            Assert.True(ObjectResult.Value.Equals(expectedResult));
         }
 
         [Fact]
@@ -65,7 +66,7 @@ namespace DisprzTraining.Tests.UnitTests.Controller
             var systemUnderTest = new AppointmentsController(MockServiceBL.Object);
 
             //Act
-            var result = systemUnderTest.AddAppointment(MockData.MockAppointment);
+            var result = systemUnderTest.AddAppointment(MockData.MockAppointmentDTO);
             var ObjectResult = (CreatedResult)result;
 
             //Assert
@@ -81,7 +82,7 @@ namespace DisprzTraining.Tests.UnitTests.Controller
             var systemUnderTest = new AppointmentsController(MockServiceBL.Object);
 
             //Act
-            var result = systemUnderTest.AddAppointment(MockData.MockAppointment);
+            var result = systemUnderTest.AddAppointment(MockData.MockAppointmentDTO);
             var ObjectResult = (ConflictObjectResult)result;
 
             //Assert
@@ -212,7 +213,7 @@ namespace DisprzTraining.Tests.UnitTests.Controller
             var controllerUnderTest = new AppointmentsController(MockServiceBL.Object);
 
             //Act
-            var result = controllerUnderTest.UpdateAppointment(MockGuid, MockData.MockAppointment);
+            var result = controllerUnderTest.UpdateAppointment(MockGuid, MockData.MockAppointmentDTO);
             var ObjectResult = (NoContentResult)result;
 
             //Assert
@@ -227,7 +228,7 @@ namespace DisprzTraining.Tests.UnitTests.Controller
             var systemUnderTest = new AppointmentsController(MockServiceBL.Object);
 
             //Act
-            var result = systemUnderTest.UpdateAppointment(MockGuid, MockData.MockAppointment);
+            var result = systemUnderTest.UpdateAppointment(MockGuid, MockData.MockAppointmentDTO);
             var ObjectResult = (ConflictObjectResult)result;
 
             //Assert
@@ -312,7 +313,8 @@ namespace DisprzTraining.Tests.UnitTests.Controller
             //Assert
             Assert.True(result?.StatusCode.Equals(400));
         }
-
+        
+        //Get All Appointments
         [Fact]
         public void GetAllAppointment_Returns_200_Success_And_Paginated_Result_Offset0_and_FetchCount5()
         {
@@ -322,7 +324,7 @@ namespace DisprzTraining.Tests.UnitTests.Controller
             var systemUnderTest = new AppointmentsController(MockServiceBL.Object);
 
             //Act
-            var result = systemUnderTest.GetAllAppointments(0, 5);
+            var result = systemUnderTest.GetAllAppointments(0, 5,null,null);
             var ObjectResult = (OkObjectResult)result;
 
             //Assert
@@ -342,7 +344,7 @@ namespace DisprzTraining.Tests.UnitTests.Controller
             var systemUnderTest = new AppointmentsController(MockServiceBL.Object);
 
             //Act
-            var result = systemUnderTest.GetAllAppointments(5, 5);
+            var result = systemUnderTest.GetAllAppointments(5, 5,null,null);
             var ObjectResult = (OkObjectResult)result;
 
             //Assert
@@ -362,7 +364,7 @@ namespace DisprzTraining.Tests.UnitTests.Controller
             var systemUnderTest = new AppointmentsController(MockServiceBL.Object);
 
             //Act
-            var result = systemUnderTest.GetAllAppointments(10, 5);
+            var result = systemUnderTest.GetAllAppointments(10, 5,null,null);
             var ObjectResult = (OkObjectResult)result;
 
             //Assert
@@ -382,7 +384,7 @@ namespace DisprzTraining.Tests.UnitTests.Controller
             var systemUnderTest = new AppointmentsController(MockServiceBL.Object);
 
             //Act
-            var result = systemUnderTest.GetAllAppointments(0, 5, new DateTime(2023, 01, 06));
+            var result = systemUnderTest.GetAllAppointments(0, 5, new DateTime(2023, 01, 06),null);
             var ObjectResult = (OkObjectResult)result;
 
             //Assert

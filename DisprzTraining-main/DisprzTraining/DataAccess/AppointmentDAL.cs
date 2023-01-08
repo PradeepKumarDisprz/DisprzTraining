@@ -4,17 +4,25 @@ namespace DisprzTraining.DataAccess
 {
     public class AppointmentDAL : IAppointmentDAL
     {
-        private static List<Appointment> _userAppointments = new List<Appointment>();
-        // {
-        //     new Appointment()
-        //     {
-        //         appointmentId=Guid.NewGuid(),
-        //         appointmentStartTime=DateTime.Now,
-        //         appointmentEndTime=DateTime.Now.AddHours(1),
-        //         appointmentTitle="standup",
-        //         appointmentDescription="meet is going to commence"
-        //     }
-        // };
+        private static List<Appointment> _userAppointments = new List<Appointment>()
+        {
+            new Appointment()
+            {
+                appointmentId=Guid.Parse("37981518-40f1-4580-946b-d47eb379453e"),
+                appointmentStartTime = new DateTime(2023, 01, 06, 13, 30, 00),
+                appointmentEndTime = new DateTime(2023, 01, 06, 14, 30, 00),
+                appointmentTitle="standup",
+                appointmentDescription="meet is going to commence"
+            },
+            new Appointment()
+            {
+                appointmentId=Guid.Parse("27921518-40f1-4580-946b-d47eb379453e"),
+                appointmentStartTime = new DateTime(2023, 01, 06, 14, 30, 00),
+                appointmentEndTime = new DateTime(2023, 01, 06, 15, 30, 00),
+                appointmentTitle="standup",
+                appointmentDescription="meet is going to commence"
+            }
+        };
         PaginatedAppointments appointmentsFound = new PaginatedAppointments();
 
         public List<Appointment> GetAppointmentByDate(DateTime date)
@@ -24,14 +32,6 @@ namespace DisprzTraining.DataAccess
                                       orderby appointment.appointmentStartTime
                                       select appointment).ToList();
             return appointmentMatched;
-        }
-
-        public bool DeleteAppointment(Guid appointmentId)
-        {
-            var appointmentMatched = (from appointment in _userAppointments
-                                      where appointment.appointmentId == appointmentId
-                                      select appointment).FirstOrDefault();
-            return (appointmentMatched != null ? _userAppointments.Remove(appointmentMatched) : false);
         }
 
         public bool CheckAppointmentConflict(DateTime startTime, DateTime endTime, List<Appointment> appointments)
@@ -58,6 +58,14 @@ namespace DisprzTraining.DataAccess
                 return true;
             }
             return false;
+        }
+
+        public bool DeleteAppointment(Guid appointmentId)
+        {
+            var appointmentMatched = (from appointment in _userAppointments
+                                      where appointment.appointmentId == appointmentId
+                                      select appointment).FirstOrDefault();
+            return (appointmentMatched != null ? _userAppointments.Remove(appointmentMatched) : false);
         }
 
         public bool UpdateAppointment(Appointment updateAppointment)
