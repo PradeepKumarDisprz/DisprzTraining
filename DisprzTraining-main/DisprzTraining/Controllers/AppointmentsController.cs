@@ -67,7 +67,7 @@ namespace DisprzTraining.Controllers
                 return BadRequest(APIResponse.BadRequestResponse);
             }
             var result = _appointmentBL.AddAppointment(newAppointment);
-            return (result != null) ? Created(nameof(GetAppointmentByDate), result) : Conflict(APIResponse.ConflictResponse);
+            return (result != null) ? Created("~v1/api/apiappointments", result) : Conflict(APIResponse.ConflictResponse);
         }
 
 
@@ -106,7 +106,6 @@ namespace DisprzTraining.Controllers
         ///
         ///     Id: "2ef43h26-4524-5245-g56a-5d552v96h1f6",
         ///     {
-        ///        
         ///        "appointmentStartTime": "2023-01-06T20:43:33.005Z",
         ///        "appointmentEndTime": "2023-01-06T20:44:43.005Z",
         ///        "appointmentTitle": "string",
