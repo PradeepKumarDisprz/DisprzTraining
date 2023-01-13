@@ -8,6 +8,5 @@ namespace DisprzTraining.DataAccess
         bool DeleteAppointment(Guid appointmentId);
         bool AddAppointment(Appointment newAppointment); 
         bool UpdateAppointment(Appointment updateAppointment);
-        PaginatedAppointments GetAllAppointments(int offSet, int fetchCount,DateTime? startDate,string? searchTitle);
     }
 }

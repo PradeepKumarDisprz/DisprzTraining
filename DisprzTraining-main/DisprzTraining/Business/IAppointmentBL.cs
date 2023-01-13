@@ -9,6 +9,5 @@ namespace DisprzTraining.Business
         NewAppointmentId? AddAppointment(AppointmentDTO newAppointment);
         bool DeleteAppointment(Guid appointmentId);
         bool UpdateAppointment(Guid appointmentId, AppointmentDTO existingAppointment);
-        PaginatedAppointments GetAllAppointments(int offSet, int fetchCount,DateTime? searchDate,string? searchTitle);
     }
 }

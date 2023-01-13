@@ -54,11 +54,6 @@ namespace DisprzTraining.Business
             return isUpdated ? true : false;
         }
 
-
-        public PaginatedAppointments GetAllAppointments(int offSet, int fetchCount, DateTime? searchDate, string? searchTitle)
-        {
-            return  _appointmentDAL.GetAllAppointments(offSet, fetchCount, searchDate, searchTitle);
-        }
     }
 }
 

@@ -87,26 +87,6 @@ namespace DisprzTraining.DataAccess
             }
             return false;
         }
-
-
-        //for learning purpose
-        public PaginatedAppointments GetAllAppointments(int offSet, int fetchCount, DateTime? searchDate, string? searchTitle)
-        {
-
-            var appointmentMatched = _userAppointments.Where(meet => ((searchDate == null) || (meet.appointmentStartTime.Date == searchDate)) && ((searchTitle == null) || (meet.appointmentTitle.ToLower().Contains(searchTitle.ToLower())))).OrderBy(meet => meet.appointmentStartTime).ToList();
-            if (appointmentMatched.Any() && fetchCount > 0)
-            {
-                appointmentsFound.appointments = appointmentMatched.Skip(offSet).Take(fetchCount).ToList();
-                appointmentsFound.isTruncated = fetchCount >= appointmentMatched.Skip(offSet).Count() ? false : true;
-            }
-            else
-            {
-                appointmentsFound.appointments = appointmentMatched;
-                appointmentsFound.isTruncated = false;
-            }
-
-            return appointmentsFound;
-        }
     }
 }
 

@@ -133,22 +133,5 @@ namespace DisprzTraining.Controllers
 
 
 
-
-
-        // ///for learning purpose/// //
-
-        /// <summary>
-        /// Fetch All Appointments with Date/Title with offset and fetchCount
-        /// </summary>
-        [HttpGet, Route("v1/api/allappointments")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaginatedAppointments))]
-        public ActionResult GetAllAppointments([Required] int offSet = 0, [Required] int fetchCount = 10, [DataType(DataType.Date)] DateTime? searchDate = null, string? searchTitle = null)
-        {
-            var appointments = _appointmentBL.GetAllAppointments(offSet, fetchCount, searchDate, searchTitle);
-            return Ok(appointments);
-        }
-
-
-
     }
 }

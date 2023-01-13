@@ -73,10 +73,5 @@
              <response code="400">Bad request if starttime greater than end time</response>
              <response code="409">Conflict Occured between meetings</response>
         </member>
-        <member name="M:DisprzTraining.Controllers.AppointmentsController.GetAllAppointments(System.Int32,System.Int32,System.Nullable{System.DateTime},System.String)">
-            <summary>
-            Fetch All Appointments with Date/Title with offset and fetchCount
-            </summary>
-        </member>
     </members>
 </doc>
