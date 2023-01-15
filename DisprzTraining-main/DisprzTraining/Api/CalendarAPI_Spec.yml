@@ -66,14 +66,38 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-  /v1/api/appointments/{appointmentId}:
+  /v1/api/appointments/{Id}:
+    delete:
+      summary: Delete an Appointment
+      operationId: deleteAppointment
+      tags:
+        - Appointments
+      parameters:
+        - name: Id
+          in: path
+          description: Appointment Id
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+      responses:
+        "204":
+          description: No Content
+
+        "404":
+          description: No Appointment found with the given Id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
     put:
       summary: Update an existing Appointment
       operationId: updateAppointment
       tags:
         - Appointments
       parameters:
-        - name: appointmentId
+        - name: Id
           in: path
           required: true
           schema:
@@ -103,30 +127,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-
-    delete:
-      summary: Delete an Appointment
-      operationId: deleteAppointment
-      tags:
-        - Appointments
-      parameters:
-        - name: appointmentId
-          in: path
-          description: Appointment Id
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-      responses:
-        "204":
-          description: No Content
-
         "404":
-          description: No Appointment found with the given Id
-          content:
+          description: Appointment Not Found with given ID
+          content: 
             application/json:
-              schema:
+              schema: 
                 $ref: "#/components/schemas/ErrorResponse"
 
 
