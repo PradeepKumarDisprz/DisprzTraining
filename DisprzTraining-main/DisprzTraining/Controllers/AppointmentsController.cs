@@ -116,10 +116,12 @@ namespace DisprzTraining.Controllers
         /// <response code="204">No Content if appointment updated</response>
         /// <response code="400">Bad request if starttime greater than end time</response>
         /// <response code="409">Conflict Occured between meetings</response>
+        /// <response code="404">Appointment is not found</response>
         [HttpPut, Route("v1/api/appointments/{Id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ErrorResponse))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
         public ActionResult UpdateAppointment([FromRoute] Guid Id, [FromBody] AppointmentDTO updateAppointment)
         {
             if ((updateAppointment.appointmentEndTime <= updateAppointment.appointmentStartTime)
@@ -127,11 +129,9 @@ namespace DisprzTraining.Controllers
             {
                 return BadRequest(APIResponse.BadRequestResponse);
             }
-            bool noConflict = _appointmentBL.UpdateAppointment(Id, updateAppointment);
-            return (noConflict) ? NoContent() : Conflict(APIResponse.ConflictResponse);
+            bool? noConflict = _appointmentBL.UpdateAppointment(Id, updateAppointment);
+            return (noConflict!=null) ?( noConflict==true? NoContent() : Conflict(APIResponse.ConflictResponse)):NotFound(APIResponse.NotFoundResponse);
         }
-
-
 
     }
 }

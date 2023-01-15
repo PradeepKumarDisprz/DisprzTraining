@@ -8,6 +8,6 @@ namespace DisprzTraining.Business
         List<Appointment> GetAppointmentByDate(DateTime date);
         NewAppointmentId? AddAppointment(AppointmentDTO newAppointment);
         bool DeleteAppointment(Guid appointmentId);
-        bool UpdateAppointment(Guid appointmentId, AppointmentDTO existingAppointment);
+        bool? UpdateAppointment(Guid appointmentId, AppointmentDTO existingAppointment);
     }
 }

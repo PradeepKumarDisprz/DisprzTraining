@@ -236,6 +236,21 @@ namespace DisprzTraining.Tests.UnitTests.Controller
         }
 
         [Fact]
+        public void UpdateAppointment_Returns_404_Not_Found_For_Meeting_NotFound_In_List()
+        {
+            //Arrange
+            MockServiceBL.Setup(service => service.UpdateAppointment(It.IsAny<Guid>(), It.IsAny<AppointmentDTO>())).Returns(()=>null);
+            var systemUnderTest = new AppointmentsController(MockServiceBL.Object);
+
+            //Act
+            var result = systemUnderTest.UpdateAppointment(MockGuid, MockData.MockAppointmentDTO);
+            var ObjectResult = (NotFoundObjectResult)result;
+
+            //Assert
+            Assert.True(ObjectResult.StatusCode.Equals(404));
+        }
+
+        [Fact]
         public void UpdateExistingAppointment_Returns_400_BadRequest_On_EndTime_LessThan_StartTime()
         {
             //Arrange  

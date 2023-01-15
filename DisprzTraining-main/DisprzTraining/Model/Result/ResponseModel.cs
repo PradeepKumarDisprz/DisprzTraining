@@ -13,11 +13,4 @@ namespace DisprzTraining.Model
         public string errorCode { get; set; }=string.Empty;
     }
 
-
-        public class PaginatedAppointments
-    {
-        public bool isTruncated { get; set; }
-        public List<Appointment> appointments { get; set; }=new List<Appointment>();
-    }
-    
 }  

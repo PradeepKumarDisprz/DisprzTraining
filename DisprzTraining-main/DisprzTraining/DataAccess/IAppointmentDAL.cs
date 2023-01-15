@@ -7,6 +7,6 @@ namespace DisprzTraining.DataAccess
         List<Appointment> GetAppointmentByDate(DateTime date);
         bool DeleteAppointment(Guid appointmentId);
         bool AddAppointment(Appointment newAppointment); 
-        bool UpdateAppointment(Appointment updateAppointment);
+        bool? UpdateAppointment(Appointment updateAppointment);
     }
 }

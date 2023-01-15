@@ -40,7 +40,7 @@ namespace DisprzTraining.Business
             return _appointmentDAL.DeleteAppointment(appointmentId);
         }
 
-        public bool UpdateAppointment(Guid appointmentId, AppointmentDTO updateAppointment)
+        public bool? UpdateAppointment(Guid appointmentId, AppointmentDTO updateAppointment)
         {
             Appointment appointmentToBeUpdated = new()
             {
@@ -50,33 +50,12 @@ namespace DisprzTraining.Business
                 appointmentTitle = updateAppointment.appointmentTitle,
                 appointmentDescription = updateAppointment.appointmentDescription
             };
-            var isUpdated = _appointmentDAL.UpdateAppointment(appointmentToBeUpdated);
-            return isUpdated ? true : false;
+            bool? isUpdated = _appointmentDAL.UpdateAppointment(appointmentToBeUpdated);
+            return isUpdated!=null ?( isUpdated==true? true : false):null;
         }
 
     }
 }
-
-
-
-//for learning purpose
-
-// public async Task<bool> UpdateAppointment(Guid appointmentId, AppointmentDTO updateAppointment)
-// {
-//     if ((updateAppointment.appointmentEndTime < updateAppointment.appointmentStartTime) || (updateAppointment.appointmentStartTime.Date < DateTime.Now.Date))
-//     {
-//         throw new Exception();
-//     }
-//     return (await _appointmentDAL.UpdateAppointment(appointmentId, updateAppointment));
-// }
-
-// public async Task<PaginatedAppointments> GetAllAppointments(int offSet, int fetchCount, DateTime? searchDate,string? searchTitle)
-// { 
-//     return (await _appointmentDAL.GetAllAppointments(offSet, fetchCount, searchDate, searchTitle));
-// }
-
-
-
 
 
 
